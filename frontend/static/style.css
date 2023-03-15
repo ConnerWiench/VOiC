@@ -143,6 +143,21 @@ body {
     margin-bottom: -15%;
     color: #495057;
   }
-  
 
+  /*for buttons*/
+  
+  .btnRegister {
+    font-size: 1em; /* sets the base font size */
+    padding: 0.5em 1em; /* sets padding around the text */
+    border-radius: 5px; /* adds rounded corners to the button */
+    background-color: #007bff; /* sets the background color */
+    color: #fff; /* sets the text color */
+    border: none; /* removes the default button border */
+    cursor: pointer; /* adds a pointer cursor on hover */
+    transition: all 0.3s ease; /* adds a smooth transition effect */
+  }
+  
+  .btnRegister:hover {
+    background-color: #0062cc; /* changes the background color on hover */
+  }
   

@@ -2,9 +2,16 @@
 <html>
   <head>
     <title>VOiC - Virtual Office in the Cloud</title>
-    <link rel="icon" href="static/img/globe.ico" type="image/x-icon" />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='img/globe.ico') }}"
+      type="image/x-icon"
+    />
 
-    <link rel="stylesheet" href="static/style.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -16,7 +23,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="#" id="logo">
-          <img src="static/img/globe.png" alt="logo" height="36" class="mr-2" />
+          <img
+            src="{{ url_for('static', filename='img/globe.png') }}"
+            alt="logo"
+            height="36"
+            class="mr-2"
+          />
           VOiC
         </a>
         <button
@@ -36,10 +48,10 @@
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/register">Sign in</a>
+              <a class="nav-link" href="{{ url_for('register') }}">Sign in</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/register">Sign up</a>
+              <a class="nav-link" href="{{ url_for('register') }}">Sign up</a>
             </li>
           </ul>
         </div>
@@ -62,21 +74,14 @@
                 of thoughts, laws, and decisions as historical records. However,
                 paper-based hard copies are vulnerable to theft, destruction,
                 and loss, while digital documents are susceptible to
-                cybercrimes. A robust document management system is needed, and
-                that's where our new web-based system called Virtual Office in
-                the Cloud (VOiC) comes in. VOiC allows users to create, share,
-                query, and update office documents securely. It also includes
-                features like decision workflows, virtual offices, and
-                role-based authorization for privacy and provenance. VOiC is
-                based on a recently proposed model for document management in
-                virtual offices.
+                cybercrimes.
               </p>
-              <a href="/register#profile">
+              <a href="{{ url_for('register', _anchor='profile') }}">
                 <button type="button" class="btn btn-primary btn-lg">
                   Sign in
                 </button>
               </a>
-              <a href="/register">
+              <a href="{{ url_for('register') }}">
                 <button type="button" class="btn btn-secondary btn-lg">
                   Sign Up
                 </button>

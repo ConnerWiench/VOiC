@@ -1,8 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Virtual Office in the Cloud</title>
-    <link rel="stylesheet" href="static/style.css" />
+    <head>
+      <title>VOiC</title>
+      <link
+        rel="icon"
+        href="{{ url_for('static', filename='img/globe.ico') }}"
+        type="image/x-icon"
+      />  
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
     <link
       href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
       rel="stylesheet"
@@ -10,17 +19,15 @@
     />
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    
-
   </head>
 
   <body>
     <div class="container-fluid register">
       <div class="row">
         <div class="col-md-3 register-left">
-          <a href="/index">
+          <a href="/">
             <img src="static/img/globe.png" alt="Virtual Office" />
-          </a>          
+          </a>
           <h3><b>V</b>irtual <b>O</b>ffice in the <b>C</b>loud</h3>
           <p>Are you ready?</p>
         </div>
@@ -167,7 +174,7 @@
                     />
                   </div>
                 </div>
-                
+                <div class="col-md-6">
                   <div class="form-group">
                     <input
                       type="password"
@@ -178,16 +185,17 @@
                   </div>
                   <input type="submit" class="btnRegister" value="Log in" />
                   <p><a href="#password">Forgotten password</a></p>
+                </div>
               </div>
             </div>
-            
+
             <div
               class="tab-pane fade show"
               id="password"
               role="tabpanel"
-              aria-labelledby="password-tab "
+              aria-labelledby="password-tab"
             >
-              <h3 class="register-heading">Add you information</h3>
+              <h3 class="register-heading">Add your information</h3>
               <div class="row register-form">
                 <div class="col-md-6">
                   <div class="form-group">
@@ -197,13 +205,15 @@
                       placeholder="Your Email *"
                       value=""
                     />
+                    <input
+                      type="submit"
+                      class="btnRegister"
+                      value="Send email"
+                    />
                   </div>
                 </div>
-                  <input type="submit" class="btnRegister" value="Send an email" />
-                
               </div>
             </div>
-
           </div>
         </div>
       </div>
