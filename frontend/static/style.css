@@ -25,6 +25,15 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
+/* Basic Use */
+
+.bg-voic {
+  background: -webkit-linear-gradient(left, #090909, #131415);
+  position: fixed;
+  display: flex;
+  align-items: center;
+}
+
 /*Sign up*/
 /*Sign up*/
 html,

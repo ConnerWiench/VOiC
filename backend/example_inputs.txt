@@ -1,0 +1,8 @@
+insert into court_user(user_name, user_first, user_last, user_level, user_created, user_password)
+values ('test-user', 'test', 'user', 1, '1900-01-01 00:00:00', 'password');
+
+insert into court_docs(docs_title, docs_path)
+values ('test document', './test docuemnt');
+
+insert into court_case(case_number, case_charge, case_user_created, case_document, case_verdict, case_time_created, case_succeed_number, case_preceed_number)
+values (25, 'jaywalking', 'test-user', 'test document', 'not guilty', '1900-01-01 00:00:00', NULL, NULL);
