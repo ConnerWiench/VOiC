@@ -30,17 +30,16 @@ def register():
 
 @app.route('/api/register', methods=['POST'])
 def api_register():
-    _username = request.form['signUser']
+    _username = request.form['signEmail']
     _first = request.form['signFirst']
     _last = request.form['signLast']
     _level = request.form['signLevel']
     _password = request.form['signPsk']
     _conPassword = request.form['signConPsk']
-    _email = request.form['signEmail']
     _created = time.strftime('%Y-%m-%d %H:%M:%S')
 
     # Validate Values
-    if not (_username and _email and _first and _last and _level and _password and _conPassword):
+    if not (_username and _first and _last and _level and _password and _conPassword):
         print("All fields need to be filled")
         return json.dumps({'html':'<span>Enter the required fields</span>'})
     elif _password != _conPassword:
