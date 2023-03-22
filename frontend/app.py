@@ -19,9 +19,6 @@ conn = mysql.connector.connect(
 
 @app.route('/')
 def main():
-    # if not session.get('user'):
-        # print("Redirecting...")
-        # return redirect('/register')
     return render_template('index.html')
 
 @app.route('/register')
@@ -66,6 +63,9 @@ def api_register():
 
 @app.route("/case_list")
 def case_list(facts = None):
+    if not session.get('user'):
+        print("Redirecting...")
+        return redirect('/register')
 
     with conn.cursor() as cursor:
         if facts == None:
@@ -83,6 +83,10 @@ def case_list(facts = None):
 
 @app.route("/case_create")
 def case_create():
+    if not session.get('user'):
+        print("Redirecting...")
+        return redirect('/register')
+    
     return render_template("case_create.html")
 
 @app.route("/api/case_create", methods=["POST"])
@@ -99,8 +103,11 @@ def api_case_create():
     with conn.cursor() as cursor:
         cursor.execute("SELECT user_level\n"\
                         "FROM court_user\n"\
-                        f"WHERE user_name == {_case_user_created};")
+                        f"WHERE user_name = '{_case_user_created}';")
         _case_level_required = cursor.fetchone()
+
+    # Debug Line
+    print(f"Information: {_case_id}, {_case_charge}, {_case_verdict}, {_case_user_created}, {_case_time_created}, {_case_file_path}")
     
     # Attempts to add document into database
     try:
