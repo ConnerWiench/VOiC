@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.32, for Linux (x86_64)
 --
--- Host: localhost    Database: mydb
+-- Host: localhost    Database: voic_db
 -- ------------------------------------------------------
 -- Server version	8.0.32-0ubuntu0.22.10.2
 
@@ -28,7 +28,7 @@ CREATE TABLE `court_case` (
   `case_verdict` varchar(45) NOT NULL,
   `case_facts` blob,
   `case_time_created` datetime NOT NULL,
-  `case_level_required` int DEFAULT NULL,
+  `case_level_required` int NOT NULL,
   `case_user_created` varchar(45) NOT NULL,
   `case_document` varchar(45) NOT NULL,
   `case_preceed_number` int DEFAULT NULL,
@@ -52,7 +52,6 @@ CREATE TABLE `court_case` (
 
 LOCK TABLES `court_case` WRITE;
 /*!40000 ALTER TABLE `court_case` DISABLE KEYS */;
-INSERT INTO `court_case` VALUES (25,'jaywalking','not guilty',NULL,'1900-01-01 00:00:00',NULL,'test-user','test document',NULL,NULL);
 /*!40000 ALTER TABLE `court_case` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -78,7 +77,6 @@ CREATE TABLE `court_docs` (
 
 LOCK TABLES `court_docs` WRITE;
 /*!40000 ALTER TABLE `court_docs` DISABLE KEYS */;
-INSERT INTO `court_docs` VALUES ('test document','./test docuemnt');
 /*!40000 ALTER TABLE `court_docs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -96,6 +94,9 @@ CREATE TABLE `court_user` (
   `user_level` int NOT NULL,
   `user_created` datetime NOT NULL,
   `user_password` varchar(45) NOT NULL,
+  `user_phone` varchar(45) NOT NULL,
+  `user_question` varchar(45) NOT NULL,
+  `user_answer` varchar(45) NOT NULL,
   PRIMARY KEY (`user_name`),
   UNIQUE KEY `user_name_UNIQUE` (`user_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -107,7 +108,6 @@ CREATE TABLE `court_user` (
 
 LOCK TABLES `court_user` WRITE;
 /*!40000 ALTER TABLE `court_user` DISABLE KEYS */;
-INSERT INTO `court_user` VALUES ('test-user','test','user',1,'1900-01-01 00:00:00','password');
 /*!40000 ALTER TABLE `court_user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -120,4 +120,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-03-17 15:48:24
+-- Dump completed on 2023-03-21 21:21:35

@@ -51,11 +51,9 @@
       <div class="mb-3">
         <label for="form_level" class="form-label">Case Access Level</label>
         <select class="form-select" id="form_level" name="form_level">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
+          {% for num in range(level + 1) %}
+          <option value="{{ num }}">{{ num }}</option>
+          {% endfor %}
         </select>
       </div>
       <div class="mb-3">
