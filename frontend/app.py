@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
@@ -12,7 +12,7 @@ app.secret_key = b"This is a super secret key"
 conn = mysql.connector.connect(
     host = "localhost",
     user = "voic",
-    password = "raspberry",
+    password = "Raspberry@111",
     database = "voic_db",
 )
 
@@ -22,12 +22,12 @@ conn = mysql.connector.connect(
 def main():
     return render_template('index.html')
 
-@app.route('/register')
-def register():
-    return render_template('register.html')
+@app.route('/sign_up')
+def sign_up():
+    return render_template('sign_up.html')
 
-@app.route('/api/register', methods=['POST'])
-def api_register():
+@app.route('/api/sign_up', methods=['POST'])
+def api_sign_up():
     print("API CALLED")
     _username = request.form['signEmail']
     _first = request.form['signFirst']
@@ -45,11 +45,11 @@ def api_register():
             and _conPassword and _phone and _question and _answer):
         print("All fields need to be filled")
         # Add Flash Error Here
-        return redirect('/register')
+        return redirect('/sign_up')
     elif _password != _conPassword:
         print("Passwords must Match")
         # Add Flash Error Here
-        return redirect('/register')
+        return redirect('/sign_up')
 
     # Hashes the password for proper security
     _hashed_password = generate_password_hash(_password)
@@ -65,11 +65,15 @@ def api_register():
                             f"'{_question}', '{_answer}');")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
-        return redirect('/register')
+        return redirect('/sign_up')
 
-    return redirect('/register') # Some sort of redirect to login page
+    return redirect('/login') # Some sort of redirect to login page
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/log_in')
+def log_in():
+    return render_template('log_in.html')
+
+@app.route('/api/log_in', methods=['POST'])
 def api_login():
     _username = request.form['loginEmail']
     _password = request.form['loginPassword']
@@ -77,7 +81,7 @@ def api_login():
     if not (_username and _password):
         print("All fields need to be filled")
         # Add Flash Error Statement
-        return redirect('/register')
+        return redirect('/log_in')
     
     with conn.cursor() as cursor:
         cursor.execute("SELECT user_name, user_password\n"\
@@ -88,7 +92,7 @@ def api_login():
     if data is None:
         print("Incorrect Email or Password")
         # Add Flash Error Statement
-        return redirect('/register')
+        return redirect('/log_in')
     
     if check_password_hash(str(data[1]), _password):
         print("Successful Login!")
@@ -97,14 +101,18 @@ def api_login():
     else:
         print("Incorrect Email or Password")
         # Add Flash Error Statement
-        return redirect('/register')
+        return redirect('/log_in')
+
+@app.route('/password')
+def password():
+    return render_template('password.html')
 
 
 @app.route("/case_list")
 def case_list(facts = None):
     if not session.get('user'):
         print("Redirecting...")
-        return redirect('/register')
+        return redirect('/log_in')
 
     with conn.cursor() as cursor:
         if facts == None:
@@ -122,7 +130,7 @@ def case_list(facts = None):
 def case_create():
     if not session.get('user'):
         print("Redirecting...")
-        return redirect('/register')
+        return redirect('/log_in')
     
     # Pulls user level and sets the page to only show user eligible levels
     user = session.get('user')
