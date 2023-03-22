@@ -163,30 +163,36 @@
               aria-labelledby="profile-tab"
             >
               <h3 class="register-heading">Log In</h3>
-              <div class="row register-form">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <input
+              <form id="form-login" action="/api/login" method="POST">
+                <div class="row register-form">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input
                       type="email"
+                      name="loginEmail"
+                      id="loginEmail"
                       class="form-control"
                       placeholder="Email *"
                       value=""
-                    />
+                      />
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <input
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input
                       type="password"
+                      name="loginPassword"
+                      id="loginPassword"
                       class="form-control"
                       placeholder="Password *"
                       value=""
-                    />
+                      />
+                    </div>
+                    <input type="submit" class="btnRegister" value="Log in" />
+                    <p><a href="#password">Forgotten password</a></p>
                   </div>
-                  <input type="submit" class="btnRegister" value="Log in" />
-                  <p><a href="#password">Forgotten password</a></p>
                 </div>
-              </div>
+              </form>
             </div>
 
             <div

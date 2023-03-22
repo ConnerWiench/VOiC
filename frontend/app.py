@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, json
+from flask import Flask, render_template, request, redirect, session, json, flash
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
@@ -59,6 +59,33 @@ def api_register():
         return # Add actual returnls
 
     return # Some sort of redirect to login page
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    _username = request.form['loginEmail']
+    _password = request.form['loginPassword']
+
+    if not (_username and _password):
+        print("All fields need to be filled")
+        return json.dumps({'html':'<span>Enter the required fields</span>'})
+    
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_name, user_password\n"\
+                        "FROM court_user\n"\
+                        f"WHERE user_name = '{_username}'")
+        data = cursor.fetchone()
+
+    if data is None:
+        print("Incorrect Email or Password")
+        return json.dumps({'html':'<span>Incorrect Email or Password</span>'})
+    
+    if check_password_hash(str(data[1]), _password):
+        print("Successful Login!")
+        session['user'] = data[0]
+        return redirect('/case_list')
+    else:
+        print("Incorrect Email or Password")
+        return json.dumps({'html':'<span>Incorrect Email or Password</span>'})
 
 
 @app.route("/case_list")
