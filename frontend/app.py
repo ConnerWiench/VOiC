@@ -54,12 +54,6 @@ def api_register():
     # Hashes the password for proper security
     _hashed_password = generate_password_hash(_password)
 
-    print("INSERT INTO court_user(user_name, user_first, user_last, "\
-            "user_level, user_created, user_password, user_phone, "\
-            "user_question, user_answer)\n"\
-            f"VALUES ('{_username}', '{_first}', '{_last}', {_level}, "\
-            f"'{_created}', '{_hashed_password}', '{_phone}', "\
-            f"'{_question}', '{_answer}');")
     # Attempts to add user into database
     try:
         with conn.cursor() as cursor:
@@ -136,12 +130,13 @@ def case_create():
         cursor.execute("SELECT user_level\n"\
                         "FROM court_user\n"\
                         f"WHERE user_name = '{user}';")
-        level = cursor.fetchone()
-    # If there is no user level for some reason, set to 0
-    if level[0] is None:
-        level[0] = 0
+        level = cursor.fetchone()[0]
 
-    return render_template("case_create.html", level=level[0])
+    # If there is no user level for some reason, set to 0
+    if level is None:
+        level = 0
+
+    return render_template("case_create.html", level=level)
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
@@ -149,13 +144,13 @@ def api_case_create():
     _case_charge = convert_to_alpnum(request.form["form_charge"])
     _case_verdict = convert_to_alpnum(request.form["form_verdict"])
     _case_user_created = session.get("user")
-    _case_level = session.get("form_level")
+    _case_level = int(request.form["form_level"])
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
     _case_document = convert_to_alpnum(request.form["form_document"])
     _case_file_path = f"{DOCUMENT_PATH}{_case_document}"
 
     # Debug Line
-    print(f"Information: {_case_id}, {_case_charge}, {_case_verdict}, {_case_user_created}, {_case_time_created}, {_case_file_path}")
+    print(f"{_case_id}, {_case_charge}, {_case_verdict}, {_case_user_created}, {_case_level}, {_case_time_created}, {_case_file_path}")
 
     # Users the session saved username to get the user's access level.
     if not (_case_id and _case_charge and _case_verdict \
@@ -168,7 +163,7 @@ def api_case_create():
         cursor.execute("SELECT user_level\n"\
                         "FROM court_user\n"\
                         f"WHERE user_name = '{_case_user_created}';")
-        userLevelMax = cursor.fetchone()
+        userLevelMax = cursor.fetchone()[0]
     if _case_level > userLevelMax or _case_level < 0:
         print("An Access Level Error has Occurred")
         # Add Flash Error Here
@@ -177,8 +172,8 @@ def api_case_create():
     # Attempts to add document into database
     try:
         with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO court_docs(docs_title, docs_path)"\
-                        f"VALUES ({_case_document}, {_case_file_path})")
+            cursor.execute("INSERT INTO court_docs(docs_title, docs_path)\n"\
+                            f"VALUES ('{_case_document}', '{_case_file_path}');")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
@@ -191,14 +186,15 @@ def api_case_create():
                             "case_user_created, case_document, case_verdict, "\
                             "case_time_created, case_level_required)\n"\
                             f"VALUES ({_case_id}, '{_case_charge}', '{_case_user_created}', "\
-                            f"'{_case_document}', '{_case_verdict}', '{_case_time_created}'"\
+                            f"'{_case_document}', '{_case_verdict}', '{_case_time_created}', "\
                             f"{_case_level});")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
         return  redirect("/case_create")
     
-    return # Redirect to case edit page
+    conn.commit()
+    return redirect("/case_list") # Redirect to case edit page in furture
 
 
 # ----- Normal Functions ----- (Move to different file eventually)
