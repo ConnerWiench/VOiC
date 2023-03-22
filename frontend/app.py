@@ -66,15 +66,17 @@ def api_sign_up():
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         return redirect('/sign_up')
-
-    return redirect('/login') # Some sort of redirect to login page
+    
+    # Commit changes to the databse and send user to login on successful sign up.
+    conn.commit()
+    return redirect('/log_in') # Some sort of redirect to login page
 
 @app.route('/log_in')
 def log_in():
     return render_template('log_in.html')
 
 @app.route('/api/log_in', methods=['POST'])
-def api_login():
+def api_log_in():
     _username = request.form['loginEmail']
     _password = request.form['loginPassword']
 
@@ -201,6 +203,7 @@ def api_case_create():
         # Add Flash Error Window
         return  redirect("/case_create")
     
+    # Commit new caze to database and send user to case edit page
     conn.commit()
     return redirect("/case_list") # Redirect to case edit page in furture
 
