@@ -121,6 +121,14 @@
                     value=""
                     />
                   </div>
+                  <div class="form-group">
+                    <select class="form-control" name="signLevel" id="signLevel">
+                      <option value="0">User Level</option>
+                      {% for num in range(1, 6) %}
+                      <option value="{{ num }}">{{ num }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
@@ -149,7 +157,7 @@
                   <div class="form-group">
                     <select class="form-control" name="signQuestion" id="signQuestion">
                       <!-- <option class="hidden" selected disabled> Temp disable to fix submit error-->
-                      <option class="hidden">
+                      <option class="hidden" value="0">
                         Please select your Sequrity Question
                       </option>
                       <option>What is your Birthdate?</option>

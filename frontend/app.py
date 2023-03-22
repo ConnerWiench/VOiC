@@ -7,6 +7,7 @@ import time
 DOCUMENT_PATH = "../case_documents/"
 
 app = Flask(__name__)
+app.secret_key = b"This is a super secret key"
 
 conn = mysql.connector.connect(
     host = "localhost",
@@ -31,7 +32,7 @@ def api_register():
     _username = request.form['signEmail']
     _first = request.form['signFirst']
     _last = request.form['signLast']
-    _level = 0 #request.form['signLevel'] # Need to add user level option on webpage
+    _level = request.form['signLevel']
     _password = request.form['signPsk']
     _conPassword = request.form['signConPsk']
     _phone = request.form['signPhone']
@@ -53,15 +54,21 @@ def api_register():
     # Hashes the password for proper security
     _hashed_password = generate_password_hash(_password)
 
+    print("INSERT INTO court_user(user_name, user_first, user_last, "\
+            "user_level, user_created, user_password, user_phone, "\
+            "user_question, user_answer)\n"\
+            f"VALUES ('{_username}', '{_first}', '{_last}', {_level}, "\
+            f"'{_created}', '{_hashed_password}', '{_phone}', "\
+            f"'{_question}', '{_answer}');")
     # Attempts to add user into database
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_user(user_name, user_first, user_last, "\
                             "user_level, user_created, user_password, user_phone, "\
-                            "user_ question, user_answer)\n"\
+                            "user_question, user_answer)\n"\
                             f"VALUES ('{_username}', '{_first}', '{_last}', {_level}, "\
                             f"'{_created}', '{_hashed_password}', '{_phone}', "\
-                            f"'{_question}', '{_answer}';)")
+                            f"'{_question}', '{_answer}');")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         return redirect('/register')
@@ -101,9 +108,9 @@ def api_login():
 
 @app.route("/case_list")
 def case_list(facts = None):
-    # if not session.get('user'):
-    #     print("Redirecting...")
-    #     return redirect('/register')
+    if not session.get('user'):
+        print("Redirecting...")
+        return redirect('/register')
 
     with conn.cursor() as cursor:
         if facts == None:
@@ -119,9 +126,9 @@ def case_list(facts = None):
 
 @app.route("/case_create")
 def case_create():
-    # if not session.get('user'):
-    #     print("Redirecting...")
-    #     return redirect('/register')
+    if not session.get('user'):
+        print("Redirecting...")
+        return redirect('/register')
     
     # Pulls user level and sets the page to only show user eligible levels
     user = session.get('user')
@@ -131,10 +138,10 @@ def case_create():
                         f"WHERE user_name = '{user}';")
         level = cursor.fetchone()
     # If there is no user level for some reason, set to 0
-    if level is None:
-        level = 0
+    if level[0] is None:
+        level[0] = 0
 
-    return render_template("case_create.html", level=level)
+    return render_template("case_create.html", level=level[0])
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
