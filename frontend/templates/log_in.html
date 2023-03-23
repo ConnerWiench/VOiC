@@ -1,35 +1,35 @@
-{% extends 'layouts.html'%}
-
-{%block content%}
-<h3 class="register-heading">Log In</h3>
-          <form id="form-login" action="/api/log_in" method="POST">
-            <div class="row register-form">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <input
-                  type="email"
-                  name="loginEmail"
-                  id="loginEmail"
-                  class="form-control"
-                  placeholder="Email *"
-                  value=""
-                  />
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <input
-                  type="password"
-                  name="loginPassword"
-                  id="loginPassword"
-                  class="form-control"
-                  placeholder="Password *"
-                  value=""
-                  />
-                </div>
-                <input type="submit" class="btnRegister" value="Log in" />
-                <p><a href="{{ url_for('password') }}">Forgotten password</a></p>
-              </div>
-            </div>
-          </form>
+{% extends 'layout1.html'%} {%block content%}
+<div class="col-md-9 register-right">
+  <h3 class="register-heading">Log In</h3>
+  <form id="form-login" action="/api/log_in" method="POST">
+    <div class="row register-form">
+      <div class="col-md-6">
+        <div class="form-group">
+          <input
+            type="email"
+            name="loginEmail"
+            id="loginEmail"
+            class="form-control"
+            placeholder="Email *"
+            value=""
+          />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <input
+            type="password"
+            name="loginPassword"
+            id="loginPassword"
+            class="form-control"
+            placeholder="Password *"
+            value=""
+          />
+        </div>
+        <input type="submit" class="btnRegister" value="Log in" />
+        <p><a href="{{ url_for('password') }}">Forgotten password</a></p>
+      </div>
+    </div>
+  </form>
+</div>
 {%endblock content%}

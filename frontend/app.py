@@ -26,6 +26,11 @@ def main():
 def sign_up():
     return render_template('sign_up.html',title='Join VOiC')
 
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+
 @app.route('/api/sign_up', methods=['POST'])
 def api_sign_up():
     print("API CALLED")
