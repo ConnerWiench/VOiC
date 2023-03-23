@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
@@ -143,6 +143,22 @@ def case_list(facts = None):
         userLevel = 0
 
     return render_template('case_list.html', cases=cases, userLevel=userLevel)
+
+@app.route("/case_list/api/download", methods=["POST"])
+def case_list_api_download():
+    docTitle = request.form["docName"]
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT docs_path\n"\
+                        "FROM court_docs\n"\
+                        f"WHERE docs_title = {docTitle}")
+        docPath = cursor.fetchone()
+
+    try:
+        return (send_file(f"{docPath}", attachment_filename=f"{docTitle}.txt"))
+    except Exception as e:
+        print(f"Error: {e}\nCancelling...")
+        return redirect("/case_list")
 
 @app.route("/case_create")
 def case_create():
