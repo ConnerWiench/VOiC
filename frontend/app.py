@@ -20,11 +20,11 @@ conn = mysql.connector.connect(
 
 @app.route('/')
 def main():
-    return render_template('index.html')
+    return render_template('index.html',title='VOiC - Virtual Office in the Cloud')
 
 @app.route('/sign_up')
 def sign_up():
-    return render_template('sign_up.html')
+    return render_template('sign_up.html',title='Join VOiC')
 
 @app.route('/api/sign_up', methods=['POST'])
 def api_sign_up():
@@ -73,7 +73,7 @@ def api_sign_up():
 
 @app.route('/log_in')
 def log_in():
-    return render_template('log_in.html')
+    return render_template('log_in.html',title='Log in')
 
 @app.route('/api/log_in', methods=['POST'])
 def api_log_in():
@@ -107,7 +107,7 @@ def api_log_in():
 
 @app.route('/password')
 def password():
-    return render_template('password.html')
+    return render_template('password.html',title='Forgotten Password')
 
 
 @app.route("/case_list")
