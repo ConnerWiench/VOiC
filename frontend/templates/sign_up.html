@@ -1,6 +1,7 @@
-{% extends 'layouts.html'%}
+{% extends 'layout1.html'%}
 
 {%block content%}
+<div class="col-md-9 register-right">
 <h3 class="register-heading">Create an Account</h3>
 <form id="form-register" action="/api/sign_up" method="POST">
   <div class="row register-form">
@@ -109,5 +110,6 @@
       ><u>Login here</u></a
     >
   </p>
+</div>
 </div>
 {%endblock content%}
