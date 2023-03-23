@@ -116,17 +116,33 @@ def case_list(facts = None):
         print("Redirecting...")
         return redirect('/log_in')
 
+    # Pull up to 25 case information arrays to list
     with conn.cursor() as cursor:
         if facts == None:
-            cursor.execute("SELECT case_number, case_document, case_time_created\n"\
-                            "FROM court_case;")
+            cursor.execute("SELECT case_number, case_document, case_time_created, "\
+                            "u.user_first, u.user_last, case_level_required\n"\
+                            "FROM court_case\n"
+                            "INNER JOIN court_user AS u ON court_case.case_user_created=u.user_name;")
         else:
-            cursor.execute("SELECT case_number, case_document, case_time_created\n"\
-                            "FROM court_case;")
+            cursor.execute("SELECT case_number, case_document, case_time_created, "\
+                            "u.user_first, u.user_last, case_level_required\n"\
+                            "FROM court_case\n"
+                            "INNER JOIN court_user AS u ON court_case.case_user_created=u.user_name;")
                             #Put Where statement to check the fact blob
-        cases = cursor.fetchall()
+        cases = cursor.fetchmany(size=25)
         
-    return render_template('case_list.html', cases=cases)
+    # Get user level to determine which cards should have edit button.
+    currentUser = session.get('user')
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_level\n"\
+                        "FROM court_user\n"\
+                        f"WHERE user_name = '{currentUser}';")
+        userLevel = cursor.fetchone()[0]
+    # If nothing else, put user at minimum level.
+    if userLevel is None:
+        userLevel = 0
+
+    return render_template('case_list.html', cases=cases, userLevel=userLevel)
 
 @app.route("/case_create")
 def case_create():
@@ -158,9 +174,6 @@ def api_case_create():
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
     _case_document = convert_to_alpnum(request.form["form_document"])
     _case_file_path = f"{DOCUMENT_PATH}{_case_document}"
-
-    # Debug Line
-    print(f"{_case_id}, {_case_charge}, {_case_verdict}, {_case_user_created}, {_case_level}, {_case_time_created}, {_case_file_path}")
 
     # Users the session saved username to get the user's access level.
     if not (_case_id and _case_charge and _case_verdict \
