@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>VOiC - Virtual Office in the Cloud</title>
+    <title>{{title}}</title>
     <link
       rel="icon"
       href="{{ url_for('static', filename='img/globe.ico') }}"
@@ -48,7 +48,7 @@
               <a class="nav-link active" aria-current="page" href="#">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('log_in') }}">Sign in</a>
+              <a class="nav-link" href="{{ url_for('log_in') }}">Log in</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('sign_up') }}">Sign up</a>
@@ -78,7 +78,7 @@
               </p>
               <a href="{{ url_for('log_in') }}">
                 <button type="button" class="btn btn-primary btn-lg">
-                  Sign in
+                  Log in
                 </button>
               </a>
               <a href="{{ url_for('sign_up') }}">
