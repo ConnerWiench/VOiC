@@ -3,8 +3,10 @@ from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 import time
+import os
 
-DOCUMENT_PATH = "../case_documents/"
+DOCUMENT_PATH = "../case_documents"
+COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
 
 app = Flask(__name__)
 app.secret_key = b"This is a super secret key"
@@ -22,14 +24,14 @@ conn = mysql.connector.connect(
 def main():
     return render_template('index.html',title='VOiC - Virtual Office in the Cloud')
 
-@app.route('/sign_up')
-def sign_up():
-    return render_template('sign_up.html',title='Join VOiC')
-
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
 
+
+@app.route('/sign_up')
+def sign_up():
+    return render_template('sign_up.html',title='Join VOiC', roles=COURT_ROLES)
 
 @app.route('/api/sign_up', methods=['POST'])
 def api_sign_up():
@@ -65,7 +67,7 @@ def api_sign_up():
             cursor.execute("INSERT INTO court_user(user_name, user_first, user_last, "\
                             "user_level, user_created, user_password, user_phone, "\
                             "user_question, user_answer)\n"\
-                            f"VALUES ('{_username}', '{_first}', '{_last}', {_level}, "\
+                            f"VALUES ('{_username}', '{_first}', '{_last}', '{_level}', "\
                             f"'{_created}', '{_hashed_password}', '{_phone}', "\
                             f"'{_question}', '{_answer}');")
     except Exception as e:
@@ -124,39 +126,42 @@ def case_list(facts = None):
     # Pull up to 25 case information arrays to list
     with conn.cursor() as cursor:
         if facts == None:
-            cursor.execute("SELECT case_number, case_document, case_time_created, "\
-                            "u.user_first, u.user_last, case_level_required\n"\
-                            "FROM court_case\n"
-                            "INNER JOIN court_user AS u ON court_case.case_user_created=u.user_name;")
+            cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
+                            "u.user_first, u.user_last, c.case_released\n"\
+                            "FROM court_case AS c\n"
+                            "LEFT JOIN junction_case_user AS j ON j.junction_role = 'Judge' AND "\
+                            "c.case_number = j.junction_case\n"\
+                            "INNER JOIN court_user AS u ON j.junction_user = u.user_name;")
+                # Keeping both for now to test later
+            # cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
+            #                 "u.user_first, u.user_last, c.case_released\n"\
+            #                 "FROM junction_case_user AS j\n"\
+            #                 "INNER JOIN court_case AS c ON j.junction_case = c.case_number\n"\
+            #                 "INNER JOIN court_user AS u ON j.junction_user = u.user_name\n"\
+            #                 "WHERE j.junction_role = 'Judge';")
         else:
             cursor.execute("SELECT case_number, case_document, case_time_created, "\
-                            "u.user_first, u.user_last, case_level_required\n"\
+                            "u.user_first, u.user_last, case_released\n"\
                             "FROM court_case\n"
-                            "INNER JOIN court_user AS u ON court_case.case_user_created=u.user_name;")
+                            "INNER JOIN junction_case-user AS j ON j.role='Judge' AND "\
+                            "court_case.number=j.case\n"\
+                            "INNER JOIN court_user AS u ON j.user=u.name;")
                             #Put Where statement to check the fact blob
         cases = cursor.fetchmany(size=25)
         
     # Get user level to determine which cards should have edit button.
     currentUser = session.get('user')
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT user_level\n"\
-                        "FROM court_user\n"\
-                        f"WHERE user_name = '{currentUser}';")
-        userLevel = cursor.fetchone()[0]
-    # If nothing else, put user at minimum level.
-    if userLevel is None:
-        userLevel = 0
 
-    return render_template('case_list.html', cases=cases, userLevel=userLevel)
+    return render_template('case_list.html', cases=cases, user=currentUser)
 
-@app.route("/case_list/api/download", methods=["POST"])
+@app.route("/api/case_list/download", methods=["POST"])
 def case_list_api_download():
     docTitle = request.form["docName"]
 
     with conn.cursor() as cursor:
         cursor.execute("SELECT docs_path\n"\
                         "FROM court_docs\n"\
-                        f"WHERE docs_title = {docTitle}")
+                        f"WHERE docs_title = '{docTitle}';")
         docPath = cursor.fetchone()
 
     try:
@@ -167,23 +172,21 @@ def case_list_api_download():
 
 @app.route("/case_create")
 def case_create():
-    if not session.get('user'):
+    user = session.get('user')
+    if user is None:
         print("Redirecting...")
         return redirect('/log_in')
     
-    # Pulls user level and sets the page to only show user eligible levels
-    user = session.get('user')
+    # Pulls user level and checks if user is allowed to proceed.
     with conn.cursor() as cursor:
         cursor.execute("SELECT user_level\n"\
                         "FROM court_user\n"\
                         f"WHERE user_name = '{user}';")
         level = cursor.fetchone()[0]
+    if level != "Judge" and level != "Clerk":
+        return redirect("/case_list")
 
-    # If there is no user level for some reason, set to 0
-    if level is None:
-        level = 0
-
-    return render_template("case_create.html", level=level)
+    return render_template("case_create.html", roles=COURT_ROLES)
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
@@ -191,14 +194,12 @@ def api_case_create():
     _case_charge = convert_to_alpnum(request.form["form_charge"])
     _case_verdict = convert_to_alpnum(request.form["form_verdict"])
     _case_user_created = session.get("user")
-    _case_level = int(request.form["form_level"])
+    _case_level = request.form["form_level"]
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
-    _case_document = convert_to_alpnum(request.form["form_document"])
-    _case_file_path = f"{DOCUMENT_PATH}{_case_document}"
 
     # Users the session saved username to get the user's access level.
     if not (_case_id and _case_charge and _case_verdict \
-            and _case_document and _case_user_created and _case_level):
+            and _case_user_created and _case_level):
         print("All Fields need to be filled")
         # Add Flash Error Statement Here
         return redirect('/case_create')
@@ -207,51 +208,46 @@ def api_case_create():
         cursor.execute("SELECT user_level\n"\
                         "FROM court_user\n"\
                         f"WHERE user_name = '{_case_user_created}';")
-        userLevelMax = cursor.fetchone()[0]
-    if _case_level > userLevelMax or _case_level < 0:
+        userLevel = cursor.fetchone()[0]
+    if userLevel != "Judge" or userLevel != "Clerk":
         print("An Access Level Error has Occurred")
         # Add Flash Error Here
         return redirect('/case_create')
-    
-    # Attempts to add document into database
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO court_docs(docs_title, docs_path)\n"\
-                            f"VALUES ('{_case_document}', '{_case_file_path}');")
-    except Exception as e:
-        print(f"Error Found: {e}\nCancelling...")
-        # Add Flash Error Window
-        return  redirect("/case_create")
 
     # Attempts to add case with attached document
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_case(case_number, case_charge, "\
-                            "case_user_created, case_document, case_verdict, "\
+                            "case_user_created, case_verdict, "\
                             "case_time_created, case_level_required)\n"\
                             f"VALUES ({_case_id}, '{_case_charge}', '{_case_user_created}', "\
-                            f"'{_case_document}', '{_case_verdict}', '{_case_time_created}', "\
-                            f"{_case_level});")
+                            f"'{_case_verdict}', '{_case_time_created}', '{_case_level}');")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
         return  redirect("/case_create")
     
-    # Commit new caze to database and send user to case edit page
+    # Commit new case to database and send user to case edit page
+    os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
     conn.commit()
     return redirect("/case_list") # Redirect to case edit page in furture
 
 
 # ----- Normal Functions ----- (Move to different file eventually)
 
-def convert_to_alpnum(str):
+def convert_to_alpnum(oldStr):
     newStr = ""
-    for i in str:
+    for i in oldStr:
         if i.isalnum() or i == ' ':
             newStr += i
     return newStr
 
 
+# ----- Run setup and then run -----
+
 if __name__ == '__main__':
+    if not os.path.exists(f"{DOCUMENT_PATH}"):
+        os.mkdir(f"{DOCUMENT_PATH}")
+        
     app.run(debug=True, port = 1111)
 conn.close()

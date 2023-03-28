@@ -18,8 +18,8 @@
       <div class="mb-3">
         <label for="form_level" class="form-label">Case Access Level</label>
         <select class="form-select" id="form_level" name="form_level">
-          {% for num in range(1, level + 1) %}
-          <option value="{{ num }}">{{ num }}</option>
+          {% for role in roles %}
+          <option value="{{ role }}">{{ role }}</option>
           {% endfor %}
         </select>
       </div>
