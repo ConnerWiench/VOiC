@@ -4,6 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 import time
 import os
+import uuid
+import secrets
+import bcrypt
+from flask_mail import Mail,Message
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DOCUMENT_PATH = "../case_documents"
 COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
@@ -18,6 +23,17 @@ conn = mysql.connector.connect(
     database = "voic_db",
 )
 
+# configure mail settings
+app.config['MAIL_SERVER'] = 'smtp.outlook.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'niraulashashwot1990@outlook.com'
+app.config['MAIL_PASSWORD'] = 'shashwot@@@'
+
+mail = Mail(app)
+
+
+
 # ----- Flask Functions -----
 
 @app.route('/')
@@ -27,7 +43,6 @@ def main():
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
-
 
 @app.route('/sign_up')
 def sign_up():
@@ -61,20 +76,23 @@ def api_sign_up():
     # Hashes the password for proper security
     _hashed_password = generate_password_hash(_password)
 
+    # Generate a unique token
+    token = secrets.token_hex(16)
+
     # Attempts to add user into database
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_user(user_name, user_first, user_last, "\
                             "user_level, user_created, user_password, user_phone, "\
-                            "user_question, user_answer)\n"\
+                            "user_question, user_answer, token)\n"\
                             f"VALUES ('{_username}', '{_first}', '{_last}', '{_level}', "\
                             f"'{_created}', '{_hashed_password}', '{_phone}', "\
-                            f"'{_question}', '{_answer}');")
+                            f"'{_question}', '{_answer}', '{token}');")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         return redirect('/sign_up')
     
-    # Commit changes to the databse and send user to login on successful sign up.
+    # Commit changes to the database and send user to login on successful sign up.
     conn.commit()
     return redirect('/log_in') # Some sort of redirect to login page
 
@@ -242,6 +260,60 @@ def convert_to_alpnum(oldStr):
             newStr += i
     return newStr
 
+@app.route('/forgot',methods=["POST","GET"])
+def forgot():
+    if 'login' in session:
+        return redirect('/')
+    if request.method == "POST":
+        email = request.form["username"]
+        token = str(uuid.uuid4())
+        cur = mysql.connection.cursor()
+        result = cur.execute("SELECT * FROM accounts WHERE username =%s", [email])
+        if result > 0:
+            data = cur.fetchone()
+            
+            msg = Message(subject='Forgot password requst',sender='niraulashashwot1990@outlook.com',recipients=[email])
+            msg.body=render_template("sent.html",token=token, data=data)
+            print("ready to email")
+            mail.send(msg)    
+            cur.execute("UPDATE accounts SET token=%s WHERE username=%s", [token, email])
+            cur.connection.commit()
+            cur.close()
+            flash("Email already sent to your email", 'success')
+            return redirect('/forgot')
+    
+        else:
+            flash("Email do not match",'danger')
+            
+    return render_template('forgot.html')
+
+@app.route('/reset/<token>', methods=['GET', 'POST'])
+def reset(token):
+    if 'login' in session:
+        return redirect('/')
+    if request.method == "POST":
+        password = request.form["user_password"]
+        confirm_password = request.form["confirm_password"]
+        token1 = str(uuid.uuid4())
+        if password != confirm_password:
+            flash("Password do not match", 'danger')
+            return redirect('reset')
+        password = generate_password_hash(password)
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM accounts WHERE token =%s", [token])
+        user=cur.fetchone()
+        if user:
+            cur = mysql.connection.cursor()
+            cur.execute("UPDATE accounts SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
+            cur.connection.commit()
+            cur.close()
+            flash("Your password successfully updated", 'success')
+            return redirect('/profile')
+        else:
+            flash("Your token is invalid",'danger')
+            return redirect('/')
+    
+    return render_template('reset.html')
 
 # ----- Run setup and then run -----
 

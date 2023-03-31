@@ -1,4 +1,4 @@
-{% extends 'layout1.html' %}
+{% extends 'layout2.html' %}
 
 {% block header %}
   <h1>{% block title %}Reset Password{% endblock %}</h1>
@@ -12,7 +12,7 @@
     <form method="post">
       <div class="form-group">
         <label for="inputAddress">Email</label>
-        <input name="email" type="email" class="form-control" id="inputAddress" placeholder="Enter your email" required>
+        <input name="username" type="email" class="form-control" id="inputAddress" placeholder="Enter your email" required>
       </div>
       <button style="background-color:#ff3f20 !important;" type="submit" class="btn btn-primary">Submit</button>
     </form>
