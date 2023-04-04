@@ -300,23 +300,24 @@ def reset(token):
     if 'login' in session:
         return redirect('/')
     if request.method == "POST":
-        password = request.form["user_password"]
+        password = request.form["password"]
         confirm_password = request.form["confirm_password"]
         token1 = str(uuid.uuid4())
         if password != confirm_password:
             flash("Password do not match", 'danger')
             return redirect('reset')
         password = generate_password_hash(password)
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM court_user WHERE token =%s", [token])
-        user=cur.fetchone()
-        if user:
-            cur = mysql.connection.cursor()
-            cur.execute("UPDATE court_user SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
-            cur.connection.commit()
-            cur.close()
+        
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM court_user WHERE token =%s", [token])
+            data = cursor.fetchone()
+        
+        if data:
+            with conn.cursor() as cursor:
+                cursor.execute("UPDATE court_user SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
+            conn.commit()
             flash("Your password successfully updated", 'success')
-            return redirect('/profile')
+            return redirect('/log_in')
         else:
             flash("Your token is invalid",'danger')
             return redirect('/')
