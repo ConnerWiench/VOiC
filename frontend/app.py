@@ -6,6 +6,7 @@ import time
 import os
 import uuid
 import secrets
+from dotenv import load_dotenv
 import bcrypt
 from flask_mail import Mail,Message
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -14,7 +15,11 @@ DOCUMENT_PATH = "../case_documents"
 COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
 
 app = Flask(__name__)
-app.secret_key = b"This is a super secret key"
+
+# Load environment variables from the .env file
+load_dotenv()
+
+app.secret_key = os.environ.get('SECRET_KEY').encode('utf-8')  #encode('utf-8') method converts the string value to bytes using the UTF-8 encoding.
 
 conn = mysql.connector.connect(
     host = "localhost",
@@ -27,8 +32,8 @@ conn = mysql.connector.connect(
 app.config['MAIL_SERVER'] = 'smtp.outlook.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'niraulashashwot1990@outlook.com'
-app.config['MAIL_PASSWORD'] = 'shashwot@@@'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
 mail = Mail(app)
 
@@ -267,23 +272,26 @@ def forgot():
     if request.method == "POST":
         email = request.form["username"]
         token = str(uuid.uuid4())
-        cur = mysql.connection.cursor()
-        result = cur.execute("SELECT * FROM accounts WHERE username =%s", [email])
-        if result > 0:
-            data = cur.fetchone()
+        
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM court_user WHERE user_name =%s", [email])
+            data = cursor.fetchone()
             
             msg = Message(subject='Forgot password requst',sender='niraulashashwot1990@outlook.com',recipients=[email])
             msg.body=render_template("sent.html",token=token, data=data)
             print("ready to email")
-            mail.send(msg)    
-            cur.execute("UPDATE accounts SET token=%s WHERE username=%s", [token, email])
-            cur.connection.commit()
-            cur.close()
-            flash("Email already sent to your email", 'success')
-            return redirect('/forgot')
+            mail.send(msg)
+            print('mail sent')    
+            cursor.execute("UPDATE court_user SET token=%s WHERE user_name=%s", [token, email])
+            print('cursor.connection.commit()')
+            conn.commit()
+            cursor.close()
+        
+        flash("Email already sent to your email", 'success')
+        return redirect('/log_in')
     
-        else:
-            flash("Email do not match",'danger')
+    else:
+        flash("Email do not match",'danger')
             
     return render_template('forgot.html')
 
@@ -300,11 +308,11 @@ def reset(token):
             return redirect('reset')
         password = generate_password_hash(password)
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM accounts WHERE token =%s", [token])
+        cur.execute("SELECT * FROM court_user WHERE token =%s", [token])
         user=cur.fetchone()
         if user:
             cur = mysql.connection.cursor()
-            cur.execute("UPDATE accounts SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
+            cur.execute("UPDATE court_user SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
             cur.connection.commit()
             cur.close()
             flash("Your password successfully updated", 'success')
