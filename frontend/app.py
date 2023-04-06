@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 import bcrypt
 from flask_mail import Mail,Message
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm, RecaptchaField
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email
 
 DOCUMENT_PATH = "../case_documents"
 COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
@@ -37,7 +40,17 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 
 mail = Mail(app)
 
+# reCAPTCHA configuration
+app.config["RECAPTCHA_PUBLIC_KEY"] ="6LebRGIlAAAAAE7dmHl-qy8vaI9_VT0xplNbyzJK"
+app.config["RECAPTCHA_PRIVATE_KEY"] ="6LebRGIlAAAAAL8wypO04j9vgw5EY9tEmj02H7Na"
 
+recaptcha=RecaptchaField()
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    recaptcha = RecaptchaField()
+    submit = SubmitField('Log In')
 
 # ----- Flask Functions -----
 
@@ -51,7 +64,8 @@ def profile():
 
 @app.route('/sign_up')
 def sign_up():
-    return render_template('sign_up.html',title='Join VOiC', roles=COURT_ROLES)
+    form = LoginForm()
+    return render_template('sign_up.html',title='Join VOiC', roles=COURT_ROLES, form=form)
 
 @app.route('/api/sign_up', methods=['POST'])
 def api_sign_up():
@@ -103,7 +117,8 @@ def api_sign_up():
 
 @app.route('/log_in')
 def log_in():
-    return render_template('log_in.html',title='Log in')
+    form = LoginForm()
+    return render_template('log_in.html', title='Log in', form=form)
 
 @app.route('/api/log_in', methods=['POST'])
 def api_log_in():
@@ -330,5 +345,5 @@ if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
         os.mkdir(f"{DOCUMENT_PATH}")
         
-    app.run(debug=True, port = 1111)
+    app.run(debug=True, port = 4111)
 conn.close()

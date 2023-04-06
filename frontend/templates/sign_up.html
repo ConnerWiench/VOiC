@@ -103,9 +103,12 @@
     <input type="submit" class="btnRegister" value="Register" />
   </div>
 </form>
+<div class="form-group">
+  {{ form.recaptcha() }}
+</div>
 <div class="text-end">
   <p class="text-center text-muted mt-5 mb-0">
-    Already have an account?
+    <br><br>Already have an account?
     <a href="log_in" class="fw-bold text-body"
       ><u>Login here</u></a
     >
