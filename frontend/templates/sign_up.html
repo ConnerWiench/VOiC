@@ -3,7 +3,7 @@
 {%block content%}
 <div class="col-md-9 register-right">
 <h3 class="register-heading">Create an Account</h3>
-<form id="form-register" action="/api/sign_up" method="POST">
+<form id="form-register" action="/api/sign_up" method="POST" onsubmit="return validateRecaptcha()">
   <div class="row register-form">
     <div class="col-md-6">
     <div class="form-group">
@@ -115,4 +115,20 @@
   </p>
 </div>
 </div>
+
+<script>
+  function validateRecaptcha() {
+    var response = grecaptcha.getResponse();
+    if (response.length == 0) {
+      // reCAPTCHA not completed
+      alert("Please complete the reCAPTCHA");
+      return false;
+    } else {
+      // reCAPTCHA completed
+      document.getElementById("loginSubmit").disabled = false; // enable the login submit button
+      return true;
+    }
+  }
+</script>
+
 {%endblock content%}

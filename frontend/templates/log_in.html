@@ -1,7 +1,9 @@
-{% extends 'layout1.html'%} {%block content%}
+{% extends 'layout1.html' %}
+
+{% block content %}
 <div class="col-md-9 register-right">
   <h3 class="register-heading">Log In</h3>
-  <form id="form-login" action="/api/log_in" method="POST">
+  <form id="form-login" action="/api/log_in" method="POST" onsubmit="return validateRecaptcha()">
     <div class="row register-form">
       <div class="col-md-6">
         <div class="form-group">
@@ -14,6 +16,9 @@
             value=""
           />
         </div>
+              <div class="form-group">
+        {{ form.recaptcha() }}
+      </div>
         <p><a href="{{ url_for('sign_up') }}">Don't have an account?</a></p>
       </div>
       <div class="col-md-6">
@@ -27,13 +32,26 @@
             value=""
           />
         </div>
-        <input type="submit" class="btnRegister" value="Log in" />
+        <input type="submit" id="loginSubmit" class="btnRegister" value="Log in"/>
         <p><a href="{{ url_for('forgot') }}">Forgotten password</a></p>
-      </div>
-      <div class="form-group">
-        {{ form.recaptcha() }}
       </div>
     </div>
   </form>
 </div>
-{%endblock content%}
+
+<script>
+  function validateRecaptcha() {
+    var response = grecaptcha.getResponse();
+    if (response.length == 0) {
+      // reCAPTCHA not completed
+      alert("Please complete the reCAPTCHA");
+      return false;
+    } else {
+      // reCAPTCHA completed
+      document.getElementById("loginSubmit").disabled = false; // enable the login submit button
+      return true;
+    }
+  }
+</script>
+
+{% endblock %}
