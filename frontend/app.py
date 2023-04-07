@@ -46,25 +46,17 @@ app.config["RECAPTCHA_PRIVATE_KEY"] ="6LebRGIlAAAAAL8wypO04j9vgw5EY9tEmj02H7Na"
 
 recaptcha=RecaptchaField()
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+class RecaptchaFunction(FlaskForm):
     recaptcha = RecaptchaField()
-    submit = SubmitField('Log In')
 
 # ----- Flask Functions -----
-
 @app.route('/')
 def main():
     return render_template('index.html',title='VOiC - Virtual Office in the Cloud')
 
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
 @app.route('/sign_up')
 def sign_up():
-    form = LoginForm()
+    form = RecaptchaFunction()
     return render_template('sign_up.html',title='Join VOiC', roles=COURT_ROLES, form=form)
 
 @app.route('/api/sign_up', methods=['POST'])
@@ -117,7 +109,7 @@ def api_sign_up():
 
 @app.route('/log_in')
 def log_in():
-    form = LoginForm()
+    form = RecaptchaFunction()
     return render_template('log_in.html', title='Log in', form=form)
 
 @app.route('/api/log_in', methods=['POST'])
@@ -144,6 +136,8 @@ def api_log_in():
     if check_password_hash(str(data[1]), _password):
         print("Successful Login!")
         session['user'] = data[0]
+        print(data[0])
+        print('Login Sugessful',_username)
         return redirect('/case_list')
     else:
         print("Incorrect Email or Password")
@@ -339,7 +333,34 @@ def reset(token):
     
     return render_template('reset.html')
 
-# ----- Run setup and then run -----
+@app.route('/profile')
+def profile():
+    # get user_name from session object
+    user_name = session.get('user')
+    print(user_name)
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer FROM court_user WHERE user_name = %s", (user_name,))
+        data = cursor.fetchone()
+        print(data)
+    return render_template('profile.html', user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6])
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    user_name = session.get('user')
+    if 'user_name' in request.form:
+        user_name = request.form['user_name']
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    phone_number = request.form['phone_number']
+    question = request.form['question']
+    answer = request.form['answer']
+
+    with conn.cursor() as cursor:
+        cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer, user_name))
+        conn.commit()
+
+    return redirect(url_for('profile'))
 
 if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
