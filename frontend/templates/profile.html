@@ -47,8 +47,15 @@
                             </div>
                             <div class="col-md-12">
                                 <label class="labels">Security Question</label>
-                                <input type="text" class="form-control" name="question" placeholder="Select your Question" value="{{ user_question }}">
-                            </div>
+                                <select class="form-control" name="question">
+                                  <option value="">Select your question</option>
+                                  <option value="What is your Birthdate?" {% if user_question == "What is your Birthdate?" %}selected{% endif %}>What is your Birthdate?</option>
+                                  <option value="What is Your old Phone Number" {% if user_question == "What is Your old Phone Number" %}selected{% endif %}>What is Your old Phone Number</option>
+                                  <option value="What is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
+                                  <option value="Other" {% if user_question == "Other" %}selected{% endif %}>Other</option>
+                                </select>
+                              </div>
+                              
                             <div class="col-md-12">
                                 <label class="labels">Answer</label>
                                 <input type="text" class="form-control" name="answer" placeholder="Enter your Answer" value="{{ user_answer }}">
