@@ -184,7 +184,7 @@ def case_list(facts = None):
     # Get user level to determine which cards should have edit button.
     currentUser = session.get('user')
 
-    return render_template('case_list.html', cases=cases, user=currentUser)
+    return render_template('case_list.html', cases=cases, user=currentUser,title='Case List')
 
 @app.route("/api/case_list/download", methods=["POST"])
 def case_list_api_download():
@@ -218,7 +218,7 @@ def case_create():
     if level != "Judge" and level != "Clerk":
         return redirect("/case_list")
 
-    return render_template("case_create.html", roles=COURT_ROLES)
+    return render_template("case_create.html",title='Create Case' ,roles=COURT_ROLES)
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
@@ -343,7 +343,7 @@ def profile():
         cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer FROM court_user WHERE user_name = %s", (user_name,))
         data = cursor.fetchone()
         print(data)
-    return render_template('profile.html', user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6])
+    return render_template('profile.html',title= 'Profile' ,user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6])
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
