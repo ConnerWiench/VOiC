@@ -181,7 +181,7 @@ def case_list(facts = None):
             cursor.execute("SELECT case_number, case_document, case_time_created, "\
                             "u.user_first, u.user_last, case_released\n"\
                             "FROM court_case\n"
-                            "INNER JOIN junction_case-user AS j ON j.role='Judge' AND "\
+                            "INNER JOIN junction_case_user AS j ON j.role='Judge' AND "\
                             "court_case.number=j.case\n"\
                             "INNER JOIN court_user AS u ON j.user=u.name;")
                             #Put Where statement to check the fact blob
@@ -246,6 +246,7 @@ def api_case_create():
         # Add Flash Error Statement Here
         return redirect('/case_create')
     
+    # If _case_preceed is empty, change to NULL so mysql knows its null
     if _case_preceed == '': _case_preceed = 'NULL'
 
     with conn.cursor() as cursor:
@@ -258,6 +259,16 @@ def api_case_create():
         # Add Flash Error Here
         return redirect('/case_create')
 
+    #Checks if users exist
+    with conn.cursor() as cursor:
+        for user in _case_users:
+            cursor.execute("SELECT user_name\n"\
+                            "FROM court_user\n"\
+                            f"WHERE user_name = '{user}';")
+            if cursor.fetchone() is None:
+                print("Invalid user(s)")
+                return redirect("/case_create")
+
     # Attempts to add case with attached document
     try:
         with conn.cursor() as cursor:
@@ -268,7 +279,19 @@ def api_case_create():
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
-        return  redirect("/case_create")
+        return redirect("/case_create")
+    
+    # Attaches users to case using junction table
+    try:
+        with conn.cursor() as cursor:
+            for user,role in zip(_case_users, _case_roles):
+                cursor.execute("INSERT INTO junction_case_user(junction_user, "\
+                                "junction_role, junction_case)\n"\
+                                f"VALUES ('{user}', '{role}', {_case_id});")
+    except Exception as e:
+        print(f"Error Found: {e}\nCancelling...")
+        # Add Flash Error Window
+        return redirect("/case_create")
     
     # Commit new case to database and send user to case edit page
     os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
