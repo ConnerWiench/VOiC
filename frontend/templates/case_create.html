@@ -59,17 +59,23 @@
         <input type="text" class="form-control" id="case_charge" name="case_charge" required>
       </div>
       <div class="form-group">
-        <label for="case_verdict">Case Verdict:</label>
-        <input type="text" class="form-control" id="case_verdict" name="case_verdict" required>
+        <label for="case_article">Case Article:</label>
+        <!-- <input type="text" class="form-control" id="case_verdict" name="case_verdict" required> -->
+        <select class="form-select" name="case_article" required>
+          <option value="" disabled selected>Select Article</option>
+          {% for article in articles %}
+          <option value="{{ article }}">{{ article }}</article></option>
+          {% endfor %}
+        </select>
       </div>
       <div class="form-group">
-        <label for="case_proceed_number">Case Proceeding Number:</label>
+        <label for="case_proceed_number">Case Preceeding Number (Optional):</label>
         <input type="text" class="form-control" id="case_preceed_number" name="case_preceed_number">
       </div>
       <div class="form-group" id="case_users">
-        <label for="case_users">Users:</label>
+        <label for="case_users">User Emails:</label>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="Enter User Name" name="case_users[]" required>
+          <input type="text" class="form-control" placeholder="Enter User Email" name="case_users[]" required>
           <select class="form-select" name="case_roles[]" required>
             <option value="" disabled selected>Select Role</option>
             {% for role in roles %}
@@ -92,7 +98,7 @@
     document.getElementById("add-user").addEventListener("click", function () {
       var div = document.createElement("div");
       div.classList.add("input-group", "mb-3");
-      div.innerHTML = '<input type="text" class="form-control" placeholder="Enter User Name" name="case_users[]" required>' +
+      div.innerHTML = '<input type="text" class="form-control" placeholder="Enter User Email" name="case_users[]" required>' +
         '<select class="form-select" name="case_roles[]" required>' +
         '<option value="" disabled selected>Select Role</option>' +
         '{% for role in roles %}' +
@@ -100,7 +106,7 @@
         '{% endfor %}' +
         '</select>' +
         '<button class="btn btn-secondary" type="button" onclick="this.parentNode.parentNode.removeChild(this.parentNode)">Remove User</button>';
-      document.getElementById("users").appendChild(div);
+      document.getElementById("case_users").appendChild(div);
     });
   </script>
 </body>

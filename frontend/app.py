@@ -16,6 +16,10 @@ from wtforms.validators import DataRequired, Email
 
 DOCUMENT_PATH = "../case_documents"
 COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
+CASE_ARTICLES = ["Generial Provisions",
+                 "Jurisdiction",
+                 "Enforcement",
+                 "Miscellaneous Provisions"]
 
 app = Flask(__name__)
 
@@ -218,27 +222,29 @@ def case_create():
     if level != "Judge" and level != "Clerk":
         return redirect("/case_list")
 
-    return render_template("case_create.html",title='Create Case' ,roles=COURT_ROLES)
+    return render_template("case_create.html", title='Create Case', roles=COURT_ROLES, articles=CASE_ARTICLES)
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
     _case_id = convert_to_alpnum(request.form["case_number"])
     _case_charge = convert_to_alpnum(request.form["case_charge"])
-    _case_verdict = convert_to_alpnum(request.form["case_verdict"])
+    _case_article = convert_to_alpnum(request.form["case_article"])
     _case_preceed = convert_to_alpnum(request.form["case_preceed_number"])
-    _case_users = request.form["case_users[]"]
-    _case_roles = request.form["case_roles[]"]
+    _case_users = request.form.getlist("case_users[]")
+    _case_roles = request.form.getlist("case_roles[]")
     _case_user_created = session.get("user")
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
 
-    print(f'Stuff: {_case_roles}, {_case_users}')
+    print(f'Stuff: "{_case_preceed}"')
 
     # Users the session saved username to get the user's access level.
-    if not (_case_id and _case_charge and _case_verdict \
+    if not (_case_id and _case_charge and _case_article \
             and _case_user_created):
         print("All Fields need to be filled")
         # Add Flash Error Statement Here
         return redirect('/case_create')
+    
+    if _case_preceed == '': _case_preceed = 'NULL'
 
     with conn.cursor() as cursor:
         cursor.execute("SELECT user_level\n"\
@@ -254,10 +260,9 @@ def api_case_create():
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_case(case_number, case_charge, "\
-                            "case_verdict, "\
-                            "case_time_created, case_preceed_number)\n"\
+                            "case_article, case_time_created, case_preceed_number)\n"\
                             f"VALUES ({_case_id}, '{_case_charge}', "\
-                            f"'{_case_verdict}', '{_case_time_created}', {_case_preceed});")
+                            f"'{_case_article}', '{_case_time_created}', {_case_preceed});")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
@@ -266,7 +271,7 @@ def api_case_create():
     # Commit new case to database and send user to case edit page
     os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
     conn.commit()
-    return redirect("/case_list") # Redirect to case edit page in furture
+    return redirect(f'/case_view/{_case_id}') # Redirect to case edit page in furture
 
 
 @app.route('/case_view/<case_id>')
@@ -279,10 +284,10 @@ def case_view(case_id):
     with conn.cursor() as cursor:
         cursor.execute("SELECT *\n"\
                         "FROM court_case\n"\
-                        f"WHERE case_number='{case_id}';")
+                        f"WHERE case_number={case_id};")
         case = cursor.fetchone()
 
-    return render_template('case_view.html', user=user)
+    return render_template('case_view.html', case=case, user=user)
 
 
 # ----- Normal Functions ----- (Move to different file eventually)
