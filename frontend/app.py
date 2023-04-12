@@ -167,30 +167,35 @@ def case_list(facts = None):
             cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
                             "u.user_first, u.user_last, c.case_released\n"\
                             "FROM court_case AS c\n"
-                            "LEFT JOIN junction_case_user AS j ON j.junction_role = 'Judge' AND "\
+                            "LEFT OUTER JOIN junction_case_user AS j ON j.junction_role = 'Judge' AND "\
                             "c.case_number = j.junction_case\n"\
-                            "INNER JOIN court_user AS u ON j.junction_user = u.user_name;")
-                # Keeping both for now to test later
-            # cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
-            #                 "u.user_first, u.user_last, c.case_released\n"\
-            #                 "FROM junction_case_user AS j\n"\
-            #                 "INNER JOIN court_case AS c ON j.junction_case = c.case_number\n"\
-            #                 "INNER JOIN court_user AS u ON j.junction_user = u.user_name\n"\
-            #                 "WHERE j.junction_role = 'Judge';")
+                            "LEFT JOIN court_user AS u ON j.junction_user = u.user_name\n"\
+                            "WHERE c.case_released<>0;")
         else:
-            cursor.execute("SELECT case_number, case_document, case_time_created, "\
-                            "u.user_first, u.user_last, case_released\n"\
-                            "FROM court_case\n"
-                            "INNER JOIN junction_case_user AS j ON j.role='Judge' AND "\
-                            "court_case.number=j.case\n"\
-                            "INNER JOIN court_user AS u ON j.user=u.name;")
+            cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
+                            "u.user_first, u.user_last, c.case_released\n"\
+                            "FROM court_case AS c\n"
+                            "LEFT OUTER JOIN junction_case_user AS j ON j.junction_role = 'Judge' AND "\
+                            "c.case_number = j.junction_case\n"\
+                            "LEFT JOIN court_user AS u ON j.junction_user = u.user_name\n"\
+                            "WHERE c.case_released<>0;")
                             #Put Where statement to check the fact blob
         cases = cursor.fetchmany(size=25)
+
+        cursor.execute("SELECT c.case_number, c.case_charge, c.case_time_created, "\
+                        "u.user_first, u.user_last, c.case_released\n"\
+                        "FROM court_case AS c\n"
+                        f"INNER JOIN junction_case_user AS j ON j.junction_user = '{session.get('user')}' AND "\
+                        "c.case_number = j.junction_case\n"\
+                        "LEFT JOIN court_user AS u ON j.junction_user = u.user_name\n"\
+                        "WHERE c.case_released=0;")
+        
+        mycases = cursor.fetchmany(size=25)
         
     # Get user level to determine which cards should have edit button.
     currentUser = session.get('user')
 
-    return render_template('case_list.html', cases=cases, user=currentUser,title='Case List')
+    return render_template('case_list.html', mycases=mycases, cases=cases, user=currentUser, title='Case List')
 
 @app.route("/api/case_list/download", methods=["POST"])
 def case_list_api_download():
@@ -236,8 +241,6 @@ def api_case_create():
     _case_roles = request.form.getlist("case_roles[]")
     _case_user_created = session.get("user")
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
-
-    print(f'Stuff: "{_case_preceed}"')
 
     # Users the session saved username to get the user's access level.
     if not (_case_id and _case_charge and _case_article \
@@ -301,11 +304,31 @@ def api_case_create():
 
 @app.route('/case_view/<case_id>')
 def case_view(case_id):
+    # ----- Gate Conditions -----
     user = session.get('user')
     if user is None:
         print("Redirecting...")
         return redirect('/log_in')
     
+    # Is the case released or should this user have access
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT case_released\n"\
+                        "FROM court_case\n"\
+                        f"WHERE case_number='{case_id}';")
+        released = cursor.fetchone()[0]
+
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userLevel = cursor.fetchone()
+    
+    print(f'Stuff: {released}, {userLevel}')
+    if released == 0 and userLevel is None:
+        print("User does not have permission for this case.")
+        return redirect('/case_list')
+    # ----- End Gate -----
+
     with conn.cursor() as cursor:
         cursor.execute("SELECT *\n"\
                         "FROM court_case\n"\
@@ -314,15 +337,6 @@ def case_view(case_id):
 
     return render_template('case_view.html', case=case, user=user)
 
-
-# ----- Normal Functions ----- (Move to different file eventually)
-
-def convert_to_alpnum(oldStr):
-    newStr = ""
-    for i in oldStr:
-        if i.isalnum() or i == ' ':
-            newStr += i
-    return newStr
 
 @app.route('/forgot',methods=["POST","GET"])
 def forgot():
@@ -411,6 +425,15 @@ def update_profile():
         conn.commit()
 
     return redirect(url_for('profile'))
+
+# ----- Normal Functions ----- (Move to different file eventually)
+
+def convert_to_alpnum(oldStr):
+    newStr = ""
+    for i in oldStr:
+        if i.isalnum() or i == ' ':
+            newStr += i
+    return newStr
 
 if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
