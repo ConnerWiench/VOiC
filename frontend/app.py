@@ -95,7 +95,7 @@ def api_sign_up():
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_user(user_name, user_first, user_last, "\
                             "user_level, user_created, user_password, user_phone, "\
-                            "user_question, user_answer, token)\n"\
+                            "user_question, user_answer, user_token)\n"\
                             f"VALUES ('{_username}', '{_first}', '{_last}', '{_level}', "\
                             f"'{_created}', '{_hashed_password}', '{_phone}', "\
                             f"'{_question}', '{_answer}', '{token}');")
@@ -291,7 +291,7 @@ def forgot():
             print("ready to email")
             mail.send(msg)
             print('mail sent')    
-            cursor.execute("UPDATE court_user SET token=%s WHERE user_name=%s", [token, email])
+            cursor.execute("UPDATE court_user SET user_token=%s WHERE user_name=%s", [token, email])
             print('cursor.connection.commit()')
             conn.commit()
             cursor.close()
@@ -318,12 +318,12 @@ def reset(token):
         password = generate_password_hash(password)
         
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM court_user WHERE token =%s", [token])
+            cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
             data = cursor.fetchone()
         
         if data:
             with conn.cursor() as cursor:
-                cursor.execute("UPDATE court_user SET token=%s, user_password=%s WHERE token=%s", [token1,password, token])
+                cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
             conn.commit()
             flash("Your password successfully updated", 'success')
             return redirect('/log_in')
