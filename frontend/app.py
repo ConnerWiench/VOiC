@@ -78,10 +78,12 @@ def api_sign_up():
             and _conPassword and _phone and _question and _answer):
         print("All fields need to be filled")
         # Add Flash Error Here
+        flash("All fields need to be filled")
         return redirect('/sign_up')
     elif _password != _conPassword:
         print("Passwords must Match")
         # Add Flash Error Here
+        flash("Passwords must Match")
         return redirect('/sign_up')
 
     # Hashes the password for proper security

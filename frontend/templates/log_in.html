@@ -11,7 +11,7 @@
             type="email"
             name="loginEmail"
             id="loginEmail"
-            class="form-control"
+            class="form-control {% if 'error' in messages %}is-invalid{% endif %}"
             placeholder="Email *"
             value=""
           />
@@ -20,7 +20,7 @@
           {{ form.recaptcha() }}
           <div id="recaptchaError" style="display: none; color: red;">Please complete the reCAPTCHA</div>
         </div>
-      <p><a href="{{ url_for('sign_up') }}">Don't have an account?</a></p>
+        <p><a href="{{ url_for('sign_up') }}">Don't have an account?</a></p>
       </div>
       <div class="col-md-6">
         <div class="form-group">
@@ -28,26 +28,21 @@
             type="password"
             name="loginPassword"
             id="loginPassword"
-            class="form-control"
+            class="form-control {% if 'error' in messages %}is-invalid{% endif %}"
             placeholder="Password *"
             value=""
           />
         </div>
         <input type="submit" id="loginSubmit" class="btnRegister" value="Log in"/>
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes" style="color:red;">
-            {% for message in messages %}
-                {% if 'error' in message %}
-                    <li class="error-message">{{ message }}</li>
-                {% else %}
-                    {{ message }}
-                {% endif %}
-            {% endfor %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for message in messages %}
+                <li class="{% if 'error' in message %}error-message{% endif %}">{{ message }}</li>
+              {% endfor %}
             </ul>
-        {% endif %}
-    {% endwith %}
-    
+          {% endif %}
+        {% endwith %}
         <p><a href="{{ url_for('forgot') }}">Forgotten password</a></p>
       </div>
     </div>
