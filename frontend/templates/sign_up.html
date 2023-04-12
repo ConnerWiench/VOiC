@@ -100,7 +100,7 @@
       value=""
       />
     </div>
-    <input type="submit" class="btnRegister" value="Register" />
+    <input type="submit" class="btnRegister" id="RegisterSubmit" value="Register" />
   </div>
 </form>
 <div class="form-group">
@@ -115,6 +115,16 @@
     >
   </p>
 </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <ul class="flashes" style="color:red;">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
 </div>
 
 <script>
@@ -127,7 +137,7 @@
     } else {
         // reCAPTCHA completed
         document.getElementById("recaptchaError").style.display = "none";
-        document.getElementById("loginSubmit").disabled = false; // enable the login submit button
+        document.getElementById("RegisterSubmit").disabled = false; // enable the login submit button
         return true;
     }
   }
