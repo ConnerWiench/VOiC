@@ -222,16 +222,20 @@ def case_create():
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
-    _case_id = convert_to_alpnum(request.form["form_id"])
-    _case_charge = convert_to_alpnum(request.form["form_charge"])
-    _case_verdict = convert_to_alpnum(request.form["form_verdict"])
+    _case_id = convert_to_alpnum(request.form["case_number"])
+    _case_charge = convert_to_alpnum(request.form["case_charge"])
+    _case_verdict = convert_to_alpnum(request.form["case_verdict"])
+    _case_preceed = convert_to_alpnum(request.form["case_preceed_number"])
+    _case_users = request.form["case_users[]"]
+    _case_roles = request.form["case_roles[]"]
     _case_user_created = session.get("user")
-    _case_level = request.form["form_level"]
     _case_time_created = time.strftime('%Y-%m-%d %H:%M:%S')
+
+    print(f'Stuff: {_case_roles}, {_case_users}')
 
     # Users the session saved username to get the user's access level.
     if not (_case_id and _case_charge and _case_verdict \
-            and _case_user_created and _case_level):
+            and _case_user_created):
         print("All Fields need to be filled")
         # Add Flash Error Statement Here
         return redirect('/case_create')
@@ -241,8 +245,8 @@ def api_case_create():
                         "FROM court_user\n"\
                         f"WHERE user_name = '{_case_user_created}';")
         userLevel = cursor.fetchone()[0]
-    if userLevel != "Judge" or userLevel != "Clerk":
-        print("An Access Level Error has Occurred")
+    if userLevel != "Judge" and userLevel != "Clerk":
+        print(f"An Access Level Error has Occurred: {userLevel}")
         # Add Flash Error Here
         return redirect('/case_create')
 
@@ -250,10 +254,10 @@ def api_case_create():
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_case(case_number, case_charge, "\
-                            "case_user_created, case_verdict, "\
-                            "case_time_created, case_level_required)\n"\
-                            f"VALUES ({_case_id}, '{_case_charge}', '{_case_user_created}', "\
-                            f"'{_case_verdict}', '{_case_time_created}', '{_case_level}');")
+                            "case_verdict, "\
+                            "case_time_created, case_preceed_number)\n"\
+                            f"VALUES ({_case_id}, '{_case_charge}', "\
+                            f"'{_case_verdict}', '{_case_time_created}', {_case_preceed});")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
@@ -263,6 +267,22 @@ def api_case_create():
     os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
     conn.commit()
     return redirect("/case_list") # Redirect to case edit page in furture
+
+
+@app.route('/case_view/<case_id>')
+def case_view(case_id):
+    user = session.get('user')
+    if user is None:
+        print("Redirecting...")
+        return redirect('/log_in')
+    
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT *\n"\
+                        "FROM court_case\n"\
+                        f"WHERE case_number='{case_id}';")
+        case = cursor.fetchone()
+
+    return render_template('case_view.html', user=user)
 
 
 # ----- Normal Functions ----- (Move to different file eventually)

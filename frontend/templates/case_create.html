@@ -1,5 +1,5 @@
 {% extends 'layout2.html'%} {%block content%}
-<body>
+<!-- <body>
   <h1 class="text-center">Create Court Case</h1>
   <div class="container-md">
     <form method="POST" action="/api/case_create">
@@ -34,6 +34,78 @@
     </form>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
+</body> -->
+
+<!-- ----- -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Case Information</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+
+<body>
+  <div class="container-sm">
+    <h1>Case Information</h1>
+    <form action="/api/case_create" method="POST">
+      <div class="form-group">
+        <label for="case_number">Case Number:</label>
+        <input type="text" class="form-control" id="case_number" name="case_number" required>
+      </div>
+      <div class="form-group">
+        <label for="case_charge">Case Charge:</label>
+        <input type="text" class="form-control" id="case_charge" name="case_charge" required>
+      </div>
+      <div class="form-group">
+        <label for="case_verdict">Case Verdict:</label>
+        <input type="text" class="form-control" id="case_verdict" name="case_verdict" required>
+      </div>
+      <div class="form-group">
+        <label for="case_proceed_number">Case Proceeding Number:</label>
+        <input type="text" class="form-control" id="case_preceed_number" name="case_preceed_number">
+      </div>
+      <div class="form-group" id="case_users">
+        <label for="case_users">Users:</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Enter User Name" name="case_users[]" required>
+          <select class="form-select" name="case_roles[]" required>
+            <option value="" disabled selected>Select Role</option>
+            {% for role in roles %}
+            <option value="{{ role }}">{{ role }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-secondary" type="button"
+            onclick="this.parentNode.parentNode.removeChild(this.parentNode)">Remove User</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-secondary" type="button" id="add-user">Add User</button>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script>
+    document.getElementById("add-user").addEventListener("click", function () {
+      var div = document.createElement("div");
+      div.classList.add("input-group", "mb-3");
+      div.innerHTML = '<input type="text" class="form-control" placeholder="Enter User Name" name="case_users[]" required>' +
+        '<select class="form-select" name="case_roles[]" required>' +
+        '<option value="" disabled selected>Select Role</option>' +
+        '{% for role in roles %}' +
+        '<option value="{{ role }}">{{ role }}</option>' +
+        '{% endfor %}' +
+        '</select>' +
+        '<button class="btn btn-secondary" type="button" onclick="this.parentNode.parentNode.removeChild(this.parentNode)">Remove User</button>';
+      document.getElementById("users").appendChild(div);
+    });
+  </script>
 </body>
+
+</html>
+
 
 {%endblock content%}
