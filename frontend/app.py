@@ -118,8 +118,8 @@ def api_log_in():
     _password = request.form['loginPassword']
 
     if not (_username and _password):
-        print("All fields need to be filled")
-        # Add Flash Error Statement
+        flash('All fields need to be filled')
+        print('All fields need to be filled')
         return redirect('/log_in')
     
     with conn.cursor() as cursor:
@@ -129,20 +129,20 @@ def api_log_in():
         data = cursor.fetchone()
 
     if data is None:
-        print("Incorrect Email or Password")
-        # Add Flash Error Statement
+        flash('Incorrect Email or Password')
+        print('Incorrect Email or Password')
         return redirect('/log_in')
     
     if check_password_hash(str(data[1]), _password):
-        print("Successful Login!")
         session['user'] = data[0]
-        print(data[0])
-        print('Login Sugessful',_username)
-        return redirect('/case_list')
+        flash('Successful Login!')
+        print('Successful Login!')
+        return redirect('/profile')
     else:
-        print("Incorrect Email or Password")
-        # Add Flash Error Statement
+        flash('Incorrect Email or Password')
+        print('Incorrect Email or Password')
         return redirect('/log_in')
+
 
 @app.route('/password')
 def password():

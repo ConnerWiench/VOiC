@@ -105,6 +105,7 @@
 </form>
 <div class="form-group">
   {{ form.recaptcha() }}
+  <div id="recaptchaError" style="display: none; color: red;">Please complete the reCAPTCHA</div>
 </div>
 <div class="text-end">
   <p class="text-center text-muted mt-5 mb-0">
@@ -120,15 +121,15 @@
   function validateRecaptcha() {
     var response = grecaptcha.getResponse();
     if (response.length == 0) {
-      // reCAPTCHA not completed
-      alert("Please complete the reCAPTCHA");
-      return false;
+        // reCAPTCHA not completed
+        document.getElementById("recaptchaError").style.display = "block";
+        return false;
     } else {
-      // reCAPTCHA completed
-      document.getElementById("loginSubmit").disabled = false; // enable the login submit button
-      return true;
+        // reCAPTCHA completed
+        document.getElementById("recaptchaError").style.display = "none";
+        document.getElementById("loginSubmit").disabled = false; // enable the login submit button
+        return true;
     }
   }
 </script>
-
 {%endblock content%}

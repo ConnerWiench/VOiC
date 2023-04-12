@@ -16,10 +16,11 @@
             value=""
           />
         </div>
-              <div class="form-group">
-        {{ form.recaptcha() }}
-      </div>
-        <p><a href="{{ url_for('sign_up') }}">Don't have an account?</a></p>
+        <div class="form-group">
+          {{ form.recaptcha() }}
+          <div id="recaptchaError" style="display: none; color: red;">Please complete the reCAPTCHA</div>
+        </div>
+      <p><a href="{{ url_for('sign_up') }}">Don't have an account?</a></p>
       </div>
       <div class="col-md-6">
         <div class="form-group">
@@ -33,6 +34,20 @@
           />
         </div>
         <input type="submit" id="loginSubmit" class="btnRegister" value="Log in"/>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes" style="color:red;">
+            {% for message in messages %}
+                {% if 'error' in message %}
+                    <li class="error-message">{{ message }}</li>
+                {% else %}
+                    {{ message }}
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
         <p><a href="{{ url_for('forgot') }}">Forgotten password</a></p>
       </div>
     </div>
@@ -43,13 +58,14 @@
   function validateRecaptcha() {
     var response = grecaptcha.getResponse();
     if (response.length == 0) {
-      // reCAPTCHA not completed
-      alert("Please complete the reCAPTCHA");
-      return false;
+        // reCAPTCHA not completed
+        document.getElementById("recaptchaError").style.display = "block";
+        return false;
     } else {
-      // reCAPTCHA completed
-      document.getElementById("loginSubmit").disabled = false; // enable the login submit button
-      return true;
+        // reCAPTCHA completed
+        document.getElementById("recaptchaError").style.display = "none";
+        document.getElementById("loginSubmit").disabled = false; // enable the login submit button
+        return true;
     }
   }
 </script>
