@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -143,7 +145,7 @@ def api_log_in():
         session['user'] = data[0]
         flash('Successful Login!')
         print('Successful Login!')
-        return redirect('/profile')
+        return redirect('/case_list')
     else:
         flash('Incorrect Email or Password')
         print('Incorrect Email or Password')
@@ -330,12 +332,23 @@ def case_view(case_id):
     # ----- End Gate -----
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT *\n"\
+        cursor.execute("SELECT case_number, case_charge, case_article, case_verdict, "\
+                        "case_time_created, case_preceed_number, case_released\n"\
                         "FROM court_case\n"\
                         f"WHERE case_number={case_id};")
         case = cursor.fetchone()
 
-    return render_template('case_view.html', case=case, user=user)
+        cursor.execute("SELECT junction_user, junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id};")
+        people = cursor.fetchall()
+
+        cursor.execute("SELECT docs_title, docs_type, docs_approved\n"\
+                        "FROM court_docs\n"
+                        f"WHERE docs_case={case_id};")
+        docs = cursor.fetchall()
+
+    return render_template('case_view2.html', case=case, people=people, docs=docs, user=user)
 
 
 @app.route('/forgot',methods=["POST","GET"])

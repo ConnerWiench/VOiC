@@ -1,13 +1,82 @@
 {% extends 'layout2.html'%} {%block content%}
 
-<body>
+<!-- <body>
   <div class="container-md">
     <h1>Case View</h1>
     <hr>
 
-    <p>{{ case }}</p>
+    <p>{a{ case }a}</p>
 
   </div>
-</body>
+</body> -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Case View</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+    integrity="sha512-HUJblFQ2tlXJ5f5/G5SkgK0dH+IPoJmFIf4ut0oyCk4D+YI9Fe1lJhCrPrJeWm3Kmou0slbsZ0oOX12JmW8dLw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <div class="container-md">
+    <h1>Case View</h1>
+    {% for row in rows %}
+    <form method="POST" action="/update">
+      <div class="row">
+        <div class="col-md-4">
+          <label for="id_{{ row.id }}">ID:</label>
+          <input type="text" id="id_{{ row.id }}" name="id" value="{{ row.id }}" readonly>
+        </div>
+        <div class="col-md-4">
+          <label for="name_{{ row.id }}">Name:</label>
+          <input type="text" id="name_{{ row.id }}" name="name" value="{{ row.name }}">
+        </div>
+        <div class="col-md-4">
+          <label for="description_{{ row.id }}">Description:</label>
+          <input type="text" id="description_{{ row.id }}" name="description" value="{{ row.description }}">
+        </div>
+      </div>
+      {% if user_level in ['Clerk', 'Judge'] %}
+      <div class="row">
+        <div class="col-md-12">
+          <label for="document_{{ row.id }}">Documents:</label>
+          <ul id="document_{{ row.id }}" class="list-group">
+            {% for document in row.documents %}
+            <li class="list-group-item">
+              <a href="{{ document.url }}" target="_blank">{{ document.name }}</a>
+              {% if user_level == 'Clerk' or user_level == 'Judge' %}
+              <button type="button" class="btn btn-success approve-button"
+                data-document-id="{{ document.id }}">Approve</button>
+                
+              <button type="button" class="btn btn-danger deny-button"
+                data-document-id="{{ document.id }}">Deny</button>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+          <button type="button" class="btn btn-primary add-document-button" data-row-id="{{ row.id }}">Add
+            Document</button>
+        </div>
+      </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </form>
+    {% endfor %}
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js" integrity="sha512-mMQrU6Iydn6nmYUKEwBzbcOeA0TXtb2I9vOjKHeOgIt34l
+
+
 
 {% endblock content %}
