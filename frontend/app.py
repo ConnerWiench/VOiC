@@ -417,10 +417,10 @@ def profile():
     print(user_name)
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer FROM court_user WHERE user_name = %s", (user_name,))
+        cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer, user_address1, user_address2, user_postcode FROM court_user WHERE user_name = %s", (user_name,))
         data = cursor.fetchone()
         print(data)
-    return render_template('profile.html',title= 'Profile' ,user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6])
+    return render_template('profile.html',title= 'Profile' ,user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6],address1=data[7], address2=data[8], postcode=data[9])
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
@@ -432,9 +432,15 @@ def update_profile():
     phone_number = request.form['phone_number']
     question = request.form['question']
     answer = request.form['answer']
+    address1=request.form['address1']
+    address2=request.form['address2']
+    postcode=request.form['postcode']
 
+    print(first_name)
+    print(address1)
+    
     with conn.cursor() as cursor:
-        cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer, user_name))
+        cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer,address1, address2, postcode, user_name))
         conn.commit()
 
     return redirect(url_for('profile'))

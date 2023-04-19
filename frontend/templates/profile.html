@@ -1,73 +1,73 @@
 {% extends 'layout2.html' %}
 
 {% block content %}
-    <div class="container rounded bg-white mt-5 mb-5">
-        <div class="row">
-            <div class="col-md-5 border-right">
-                <div class="p-3 py-5">
-                    <h1>Welcome {{ user_first }} {{ user_last }}!</h1>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-right">Profile Settings</h4>
+<body>
+        <div class="container rounded bg-white mt-5 mb-5">
+            <div class="row">
+                <div class="col-md-5 border-right">
+                    <div class="p-3 py-5">
+                        <form method="POST" action="{{ url_for('update_profile') }}">
+                            <div class="row mt-2">
+                                <h1>Profile Settings</h1>
+                                <h2>Welcome {{ user_first }} {{ user_last }}!</h2>
+                                <div class="col-md-6">
+                                    <label class="labels">First Name</label>
+                                    <input type="text" class="form-control" name="first_name" placeholder="First name" value="{{ user_first }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="labels">Last Name</label>
+                                    <input type="text" class="form-control" name="last_name" placeholder="Last Name" value="{{ user_last }}" >
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <label class="labels">Email ID</label>
+                                    <input type="email" class="form-control" name="email" placeholder="Enter your email" value="{{ user_name }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">Mobile Number</label>
+                                    <input type="text" class="form-control" name="phone_number" placeholder="Enter Mobile number" value="{{ user_phone }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">Address Line 1</label>
+                                    <input type="text" class="form-control" name="address1" placeholder="Enter address line 1" value="{{ address1 }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">Address Line 2</label>
+                                    <input type="text" class="form-control" name="address2" placeholder="Enter address line 2" value="{{ address2 }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">Postcode</label>
+                                    <input type="text" class="form-control" name="postcode" placeholder="Enter postcode" value="{{ postcode }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">State</label>
+                                    <input type="text" class="form-control" name="state" placeholder="Select State" value="{{ user_state }}">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="labels">Security Question</label>
+                                    <select class="form-control" name="question">
+                                    <option value="">Select your question</option>
+                                    <option value="What is your Birthdate?" {% if user_question == "What is your Birthdate?" %}selected{% endif %}>What is your Birthdate?</option>
+                                    <option value="What is Your old Phone Number" {% if user_question == "What is Your old Phone Number" %}selected{% endif %}>What is Your old Phone Number</option>
+                                    <option value="What is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
+                                    <option value="Other" {% if user_question == "Other" %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label class="labels">Answer</label>
+                                    <input type="text" class="form-control" name="answer" placeholder="Enter your Answer" value="{{ user_answer }}">
+                                </div>
+                            </div>
+                            <div class="mt-5 text-center">
+                                <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
+                            </div>
+                        </form>
                     </div>
-                    <form method="POST" action="{{ url_for('update_profile') }}">
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <label class="labels">First Name</label>
-                                <input type="text" class="form-control" name="first_name" placeholder="First name" value="{{ user_first }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="labels">Last Name</label>
-                                <input type="text" class="form-control" name="last_name" placeholder="Last Name" value="{{ user_last }}" >
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label class="labels">Email ID</label>
-                                <input type="email" class="form-control" name="email" placeholder="Enter your email" value="{{ user_name }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">Mobile Number</label>
-                                <input type="text" class="form-control" name="phone_number" placeholder="Enter Mobile number" value="{{ user_phone }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">Address Line 1</label>
-                                <input type="text" class="form-control" name="address1" placeholder="Enter address line 1" value="{{ user_address1 }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">Address Line 2</label>
-                                <input type="text" class="form-control" name="address2" placeholder="Enter address line 2" value="{{ user_address2 }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">Postcode</label>
-                                <input type="text" class="form-control" name="postcode" placeholder="Enter postcode" value="{{ user_postcode }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">State</label>
-                                <input type="text" class="form-control" name="state" placeholder="Select State" value="{{ user_state }}">
-                            </div>
-                            <div class="col-md-12">
-                                <label class="labels">Security Question</label>
-                                <select class="form-control" name="question">
-                                  <option value="">Select your question</option>
-                                  <option value="What is your Birthdate?" {% if user_question == "What is your Birthdate?" %}selected{% endif %}>What is your Birthdate?</option>
-                                  <option value="What is Your old Phone Number" {% if user_question == "What is Your old Phone Number" %}selected{% endif %}>What is Your old Phone Number</option>
-                                  <option value="What is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
-                                  <option value="Other" {% if user_question == "Other" %}selected{% endif %}>Other</option>
-                                </select>
-                              </div>
-                              
-                            <div class="col-md-12">
-                                <label class="labels">Answer</label>
-                                <input type="text" class="form-control" name="answer" placeholder="Enter your Answer" value="{{ user_answer }}">
-                            </div>
-                        </div>
-                        <div class="mt-5 text-center">
-                            <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
+</body>
 {% endblock %}
 
