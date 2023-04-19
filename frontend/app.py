@@ -348,7 +348,7 @@ def case_view(case_id):
                         f"WHERE docs_case={case_id};")
         docs = cursor.fetchall()
 
-    return render_template('case_view2.html', case=case, people=people, docs=docs, user=user)
+    return render_template('case_view.html', case=case, people=people, docs=docs, user=user, roles=COURT_ROLES)
 
 
 @app.route('/forgot',methods=["POST","GET"])
