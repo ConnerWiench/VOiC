@@ -12,7 +12,6 @@
     integrity="sha512-HUJblFQ2tlXJ5f5/G5SkgK0dH+IPoJmFIf4ut0oyCk4D+YI9Fe1lJhCrPrJeWm3Kmou0slbsZ0oOX12JmW8dLw=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-
 <div class="row">
   <div class="col-md-3">
     <div class="card mb-3">
@@ -21,16 +20,22 @@
       </div>
       <div class="card-body">
         {% for person in people %}
-        <div class="row">
+        <br>
+        <div class="row border-bottom">
           <div class="col">{{ person[1] }}</div>
           <div class="col">{{ person[0] }}</div>
+          {% if (role == 'Judge') or (role == 'Clerk') %}
           <div class="col">
-            <button class="btn btn-sm btn-danger">Remove</button>
+            <form method="POST" action="/case_view/{{ case[0] }}/remove_user">
+              <button type="submit" class="btn btn-sm btn-danger border-bottom" name="rem_user" value="{{ person[0] }}">Remove</button>
+            </form>
           </div>
+          {% endif %}
         </div>
         {% endfor %}
+        {% if (role == 'Judge') or (role == 'Clerk') %}
         <hr>
-        <form method="POST">
+        <form method="POST" action="/case_view/{{ case[0] }}/add_user">
           <div class="form-group">
             <label for="new_user">Add new user:</label>
             <input type="text" name="new_user" class="form-control" required>
@@ -46,22 +51,37 @@
           </div> <br>
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
+        {% endif %}
       </div>
     </div>
   </div>
   <div class="col-md-9">
     <div class="card mb-3">
       <div class="card-header">
-        <h5 class="card-title">{{ case[0] }}</h5>
+        <h3 class="card-title">Case Number: {{ case[0] }}</h3>
       </div>
       <div class="card-body">
-        {% if case[3] %}
-        <h6 class="card-subtitle mb-2 text-muted">{{ case[3] }}</h6>
-        {% endif %}
-        {% if case[5] %}
-        <p>Preceeding case: <a href="{{ url_for('case_view', case_id=case[5]) }}">{{
-            case[5] }}</a></p>
-        {% endif %}
+        <h6 class="card-subtitle mb-2 text-muted">Created: {{ case[4] }}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Charge: {{ case[1] }}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Article: {{ case[2] }}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">Verdict: {{ case[3] }}</h6>
+        
+        <div class="card-footer">
+          <table class="table table-borderless">
+            <tr>
+              {% if case[5] %}
+              <td>
+                <a class="btn btn-secondary float-start" href="{{ url_for('case_view', case_id=case[5]) }}">Preceding Case</a>
+              </td>
+              {% endif %}
+              {% if case[6] %}
+              <td>
+                <a class="btn btn-secondary float-end" href="{{ url_for('case_view', case_id=case[6]) }}">Succeeding Case</a>
+              </td>
+              {% endif %}
+            </tr>
+          </table>
+        </div>
         <hr>
         <h5 class="card-title">Documents</h5>
         <table class="table table-striped">

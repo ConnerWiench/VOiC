@@ -323,19 +323,19 @@ def case_view(case_id):
                         "FROM junction_case_user\n"\
                         f"WHERE junction_case={case_id}\n"\
                         f"AND junction_user='{session.get('user')}';")
-        userLevel = cursor.fetchone()
+        userRole = cursor.fetchone()[0]
     
-    print(f'Stuff: {released}, {userLevel}')
-    if released == 0 and userLevel is None:
+    if released == 0 and userRole is None:
         print("User does not have permission for this case.")
         return redirect('/case_list')
     # ----- End Gate -----
 
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT case_number, case_charge, case_article, case_verdict, "\
-                        "case_time_created, case_preceed_number, case_released\n"\
-                        "FROM court_case\n"\
-                        f"WHERE case_number={case_id};")
+    with conn.cursor(buffered=True) as cursor:
+        cursor.execute("SELECT c.case_number, c.case_charge, c.case_article, c.case_verdict, "\
+                        "c.case_time_created, c.case_preceed_number, t.case_number, c.case_released\n"\
+                        "FROM court_case AS c\n"\
+                        f"LEFT JOIN court_case AS t ON c.case_number=t.case_preceed_number\n"\
+                        f"WHERE c.case_number={case_id};")
         case = cursor.fetchone()
 
         cursor.execute("SELECT junction_user, junction_role\n"\
@@ -348,8 +348,52 @@ def case_view(case_id):
                         f"WHERE docs_case={case_id};")
         docs = cursor.fetchall()
 
-    return render_template('case_view.html', case=case, people=people, docs=docs, user=user, roles=COURT_ROLES)
+    return render_template('case_view.html', case=case, people=people, docs=docs, role=userRole, roles=COURT_ROLES)
 
+@app.route('/case_view/<case_id>/remove_user', methods=["POST"])
+def case_view_remove_user(case_id):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userRole = cursor.fetchone()[0]
+    
+    if not ((userRole == "Judge") or (userRole == "Clerk")):
+        print("User does not have permission to do this.")
+        return redirect(f'/case_view/{case_id}')
+
+    rem_user = request.form["rem_user"]
+
+    with conn.cursor() as cursor:
+        cursor.execute("DELETE FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{rem_user}';")
+        
+    return redirect(f'/case_view/{case_id}')
+        
+@app.route('/case_view/<case_id>/add_user', methods=["POST"])
+def case_view_add_user(case_id):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userRole = cursor.fetchone()[0]
+    
+    if not ((userRole == "Judge") or (userRole == "Clerk")):
+        print("User does not have permission to do this.")
+        return redirect(f'/case_view/{case_id}')
+
+    new_user = request.form["new_user"]
+    new_role = request.form["new_role"]
+
+    with conn.cursor() as cursor:
+        cursor.execute("INSERT INTO junction_case_user(junction_user, "\
+                        "junction_role, junction_case)\n"\
+                        f"VALUES ('{new_user}', '{new_role}', {case_id});")
+        
+    return redirect(f'/case_view/{case_id}')
 
 @app.route('/forgot',methods=["POST","GET"])
 def forgot():
