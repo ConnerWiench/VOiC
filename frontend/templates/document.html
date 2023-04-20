@@ -1,0 +1,12 @@
+{% extends 'layout2.html'%} {%block content%}
+
+<body>
+  <div class="container-md">
+    <h2>Add your text</h2>
+    {{ ckeditor.create(name="editor") }}
+  </div>
+  <div class="mt-5 text-center">
+    <button class="btn btn-primary profile-button" type="submit">Save</button>
+</div>
+</body>
+{%endblock content%}

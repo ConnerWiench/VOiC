@@ -67,6 +67,36 @@
           {% endfor %}
         </select>
       </div>
+      <br><h5><a href="{{ url_for('document') }}">Click to View or Edit your Case</a></h5>
+      <!--
+      Link trigger modal 
+      <a href="#" class="text-decoration-none text-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <u>Who can?</u>
+      </a>
+
+      
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Who can edit or add a case?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <ul>
+                <li>Public - Can view all documents only after it has become public.</li>
+                <li>Lawyer - Can write/create their own briefs and read all others.</li>
+                <li>Cleric - Can view all documents and approve/deny any until released.</li>
+                <li>Judge - Read/writes the verdict document and can read any docs. </li>
+              </ul>            
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>-->
+
       <div class="form-group">
         <label for="case_proceed_number">Case Preceeding Number (Optional):</label>
         <input type="text" class="form-control" id="case_preceed_number" name="case_preceed_number">

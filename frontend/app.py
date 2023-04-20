@@ -511,6 +511,12 @@ def convert_to_alpnum(oldStr):
             newStr += i
     return newStr
 
+@app.route('/document')
+def document():
+
+    return render_template('document.html',title= 'Document')
+
+
 if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
         os.mkdir(f"{DOCUMENT_PATH}")
