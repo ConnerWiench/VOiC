@@ -36,13 +36,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
 </body> -->
 
-<!-- ----- -->
-
 <!DOCTYPE html>
 <html>
 
 <head>
   <title>Case Information</title>
+  {{ ckeditor.load() }}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
 </head>
 
@@ -72,6 +71,8 @@
         <label for="case_proceed_number">Case Preceeding Number (Optional):</label>
         <input type="text" class="form-control" id="case_preceed_number" name="case_preceed_number">
       </div>
+      <h2>Add your text</h2>
+      {{ ckeditor.create(name="editor") }}
       <div class="form-group" id="case_users">
         <label for="case_users">User Emails:</label>
         <div class="input-group mb-3">

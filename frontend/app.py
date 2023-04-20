@@ -16,6 +16,10 @@ from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email
 
+from flask_ckeditor import CKEditor
+from flask_ckeditor.fields import CKEditorField
+
+
 DOCUMENT_PATH = "../case_documents"
 COURT_ROLES = ["Other", "Lawyer", "Clerk", "Judge"]
 CASE_ARTICLES = ["Generial Provisions",
@@ -24,6 +28,7 @@ CASE_ARTICLES = ["Generial Provisions",
                  "Miscellaneous Provisions"]
 
 app = Flask(__name__)
+ckeditor = CKEditor(app)
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -54,6 +59,11 @@ recaptcha=RecaptchaField()
 
 class RecaptchaFunction(FlaskForm):
     recaptcha = RecaptchaField()
+    
+class MyForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = CKEditorField('Content', validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 # ----- Flask Functions -----
 @app.route('/')
@@ -152,9 +162,64 @@ def api_log_in():
         return redirect('/log_in')
 
 
-@app.route('/password')
-def password():
-    return render_template('password.html',title='Forgotten Password')
+@app.route('/forgot',methods=["POST","GET"])
+def forgot():
+    if 'login' in session:
+        return redirect('/')
+    if request.method == "POST":
+        email = request.form["username"]
+        token = str(uuid.uuid4())
+        
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM court_user WHERE user_name =%s", [email])
+            data = cursor.fetchone()
+            
+            msg = Message(subject='Forgot password requst',sender='niraulashashwot1990@outlook.com',recipients=[email])
+            msg.body=render_template("sent.html",token=token, data=data)
+            print("ready to email")
+            mail.send(msg)
+            print('mail sent')    
+            cursor.execute("UPDATE court_user SET user_token=%s WHERE user_name=%s", [token, email])
+            print('cursor.connection.commit()')
+            conn.commit()
+            cursor.close()
+        
+        flash("Email already sent to your email", 'success')
+        return redirect('/log_in')
+    
+    else:
+        flash("Email do not match",'danger')
+            
+    return render_template('forgot.html')
+
+@app.route('/reset/<token>', methods=['GET', 'POST'])
+def reset(token):
+    if 'login' in session:
+        return redirect('/')
+    if request.method == "POST":
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+        token1 = str(uuid.uuid4())
+        if password != confirm_password:
+            flash("Password do not match", 'danger')
+            return redirect('reset')
+        password = generate_password_hash(password)
+        
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
+            data = cursor.fetchone()
+        
+        if data:
+            with conn.cursor() as cursor:
+                cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
+            conn.commit()
+            flash("Your password successfully updated", 'success')
+            return redirect('/log_in')
+        else:
+            flash("Your token is invalid",'danger')
+            return redirect('/')
+    
+    return render_template('reset.html')
 
 
 @app.route("/case_list")
@@ -217,6 +282,7 @@ def case_list_api_download():
 
 @app.route("/case_create")
 def case_create():
+    form = MyForm()
     user = session.get('user')
     if user is None:
         print("Redirecting...")
@@ -231,7 +297,7 @@ def case_create():
     if level != "Judge" and level != "Clerk":
         return redirect("/case_list")
 
-    return render_template("case_create.html", title='Create Case', roles=COURT_ROLES, articles=CASE_ARTICLES)
+    return render_template("case_create.html", title='Create Case', roles=COURT_ROLES, articles=CASE_ARTICLES,form=form)
 
 @app.route("/api/case_create", methods=["POST"])
 def api_case_create():
@@ -297,7 +363,6 @@ def api_case_create():
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
         return redirect("/case_create")
-    
     # Commit new case to database and send user to case edit page
     os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
     conn.commit()
@@ -395,65 +460,6 @@ def case_view_add_user(case_id):
         
     return redirect(f'/case_view/{case_id}')
 
-@app.route('/forgot',methods=["POST","GET"])
-def forgot():
-    if 'login' in session:
-        return redirect('/')
-    if request.method == "POST":
-        email = request.form["username"]
-        token = str(uuid.uuid4())
-        
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM court_user WHERE user_name =%s", [email])
-            data = cursor.fetchone()
-            
-            msg = Message(subject='Forgot password requst',sender='niraulashashwot1990@outlook.com',recipients=[email])
-            msg.body=render_template("sent.html",token=token, data=data)
-            print("ready to email")
-            mail.send(msg)
-            print('mail sent')    
-            cursor.execute("UPDATE court_user SET user_token=%s WHERE user_name=%s", [token, email])
-            print('cursor.connection.commit()')
-            conn.commit()
-            cursor.close()
-        
-        flash("Email already sent to your email", 'success')
-        return redirect('/log_in')
-    
-    else:
-        flash("Email do not match",'danger')
-            
-    return render_template('forgot.html')
-
-@app.route('/reset/<token>', methods=['GET', 'POST'])
-def reset(token):
-    if 'login' in session:
-        return redirect('/')
-    if request.method == "POST":
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
-        token1 = str(uuid.uuid4())
-        if password != confirm_password:
-            flash("Password do not match", 'danger')
-            return redirect('reset')
-        password = generate_password_hash(password)
-        
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
-            data = cursor.fetchone()
-        
-        if data:
-            with conn.cursor() as cursor:
-                cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
-            conn.commit()
-            flash("Your password successfully updated", 'success')
-            return redirect('/log_in')
-        else:
-            flash("Your token is invalid",'danger')
-            return redirect('/')
-    
-    return render_template('reset.html')
-
 @app.route('/profile')
 def profile():
     # get user_name from session object
@@ -502,5 +508,5 @@ if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
         os.mkdir(f"{DOCUMENT_PATH}")
         
-    app.run(debug=True, port = 4111)
+    app.run(debug=True, port = 1111)
 conn.close()
