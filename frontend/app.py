@@ -340,7 +340,7 @@ def api_case_create():
                 print("Invalid user(s)")
                 return redirect("/case_create")
 
-    # Attempts to add case with attached document
+    # Attempts to add case
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_case(case_number, case_charge, "\
