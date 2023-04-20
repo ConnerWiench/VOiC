@@ -430,10 +430,13 @@ def case_view_remove_user(case_id):
 
     rem_user = request.form["rem_user"]
 
-    with conn.cursor() as cursor:
-        cursor.execute("DELETE FROM junction_case_user\n"\
-                        f"WHERE junction_case={case_id}\n"\
-                        f"AND junction_user='{rem_user}';")
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM junction_case_user\n"\
+                            f"WHERE junction_case={case_id}\n"\
+                            f"AND junction_user='{rem_user}';")
+    except Exception as e:
+        print(f"Error: {e}\nCancelling...")
         
     return redirect(f'/case_view/{case_id}')
         
@@ -453,10 +456,14 @@ def case_view_add_user(case_id):
     new_user = request.form["new_user"]
     new_role = request.form["new_role"]
 
-    with conn.cursor() as cursor:
-        cursor.execute("INSERT INTO junction_case_user(junction_user, "\
-                        "junction_role, junction_case)\n"\
-                        f"VALUES ('{new_user}', '{new_role}', {case_id});")
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO junction_case_user(junction_user, "\
+                            "junction_role, junction_case)\n"\
+                            f"VALUES ('{new_user}', '{new_role}', {case_id});")
+    except Exception as e:
+        print(f"Error: {e}\nCancelling...")
+
         
     return redirect(f'/case_view/{case_id}')
 
