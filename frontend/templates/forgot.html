@@ -1,22 +1,27 @@
-{% extends 'layout2.html' %}
+{% extends 'layout1.html' %}
 
 {% block header %}
   <h1>{% block title %}Reset Password{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-3"></div>
-  <div style="margin-bottom:250px; margin-top:100px; background-color:aliceblue;" class="col-md-6 py-3">
-    <h2 class="py-3">Reset Password</h2>
-    <form method="post">
-      <div class="form-group">
-        <label for="inputAddress">Email</label>
-        <input name="username" type="email" class="form-control" id="inputAddress" placeholder="Enter your email" required>
-      </div>
-      <button style="background-color:#ff3f20 !important;" type="submit" class="btn btn-primary">Submit</button>
-    </form>
-  </div>
+<div class="col-md-9 register-right">
+  <h3 class="register-heading">Forgot Password</h3>
+  <form method="post">
+    <div class="row register-form">
+      <div class="col-md-6">
+        <div class="form-group">
+              <input
+                type="email"
+                name="username"
+                id="inputAddress"
+                class="form-control"
+                placeholder="Enter your email" required
+              />
+          </div>
+        </div>
+      <input type="submit" id="PasswordSubmit" class="btnRegister" value="Submit"/>
+  </form>
 </div>
 
 {% endblock %}

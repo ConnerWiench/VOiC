@@ -3,15 +3,14 @@
     font-size: 33px /* adjust the size as needed */
 }
 
+/* for nav  bar*/  
+.navbar-brand {
+  color: white;
+}
 
-/* for nav  bar*/
-
-.navbar {
-    margin-bottom: 20px;
-  }
-  
 .navbar-nav .nav-link {
-    font-size: 24px;
+  color: #fff;
+  font-size: 24px;
 }
   
 .box {
@@ -24,6 +23,7 @@
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
+
 
 /* Basic Use */
 
