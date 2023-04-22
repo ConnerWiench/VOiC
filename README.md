@@ -5,3 +5,8 @@
     - **SECRET_KEY**: your secret key
     - **MAIL_USERNAME**: your Outlook email address
     - **MAIL_PASSWORD**: your Outlook account password
+
+-Import from **'requirements.txt'**
+
+    -pip install -r requirements.txt
+
