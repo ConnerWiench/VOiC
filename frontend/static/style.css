@@ -34,6 +34,18 @@
   align-items: center;
 }
 
+/*Card Hover Effect*/
+.card-voic {
+  background: linear-gradient(to left, white 50%, rgb(221, 221, 221) 50%);
+  background-size: 200%;
+  background-position: right;
+}
+
+.card-voic:hover {
+  background-position: left;
+  transition: background-position 0.3s ease-out;
+}
+
 /*Sign up*/
 /*Sign up*/
 html,
