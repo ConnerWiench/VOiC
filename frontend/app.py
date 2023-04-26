@@ -162,6 +162,13 @@ def api_log_in():
         return redirect('/log_in')
 
 
+@app.route('/api/log_out')
+def api_log_out():
+    session.pop('user')
+
+    return redirect('/')
+
+
 @app.route('/forgot',methods=["POST","GET"])
 def forgot():
     if 'login' in session:
