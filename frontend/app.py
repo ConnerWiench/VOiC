@@ -1,4 +1,4 @@
-#!/bin/python3
+#!../voic_venv/bin/python3
 
 from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
 from jinja2 import Environment, FileSystemLoader
