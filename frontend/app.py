@@ -395,7 +395,9 @@ def case_view(case_id):
                         "FROM junction_case_user\n"\
                         f"WHERE junction_case={case_id}\n"\
                         f"AND junction_user='{session.get('user')}';")
-        userRole = cursor.fetchone()[0]
+        userRole = cursor.fetchone()
+        if userRole is not None:
+            userRole = userRole[0]
     
     if released == 0 and userRole is None:
         print("User does not have permission for this case.")
