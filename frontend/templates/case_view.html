@@ -140,12 +140,19 @@
           </thead>
           <tbody>
             {% for doc in docs %}
-            <tr>
+            <tr class="card-body">
               <td>{{ doc[0] }}</td>
               <td>{{ doc[1] }}</td>
               <td>{% if doc[2] %}Approved{% else %}Pending{% endif %}</td>
             </tr>
             {% endfor %}
+            <tr class="card-footer">
+              <form method="POST" action="/case_view/{{ case[0] }}/create_doc">
+                <div class="form-group">
+                  
+                </div>
+              </form>
+            </tr>
           </tbody>
         </table>
       </div>

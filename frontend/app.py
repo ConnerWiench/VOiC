@@ -392,12 +392,17 @@ def case_view(case_id):
         print("Redirecting...")
         return redirect('/log_in')
     
-    # Is the case released or should this user have access
+    # Is the case existing and released or should this user have access
     with conn.cursor() as cursor:
         cursor.execute("SELECT case_released\n"\
                         "FROM court_case\n"\
                         f"WHERE case_number='{case_id}';")
-        released = cursor.fetchone()[0]
+        released = cursor.fetchone()
+        if released:
+            released = released[0]
+        else:
+            flash('Case does not exists', 'danger')
+            return redirect('/case_list')
 
         cursor.execute("SELECT junction_role\n"\
                         "FROM junction_case_user\n"\
