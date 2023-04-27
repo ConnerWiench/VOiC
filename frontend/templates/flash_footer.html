@@ -1,14 +1,14 @@
 <div class="fixed-bottom text-center">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for message in messages %}
-    <div class="card mx-auto bg-{{ message[0] }}" style="max-width: 20rem;">
-        <div class="card-body alert alert-dismissible fade show" role="alert">
-            <strong>{{ message[1] }}</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for message in messages %}
+  <div class="card mx-auto bg-{{ message[0] }}" style="max-width: 20rem;">
+    <div class="card-body alert alert-dismissible fade show" role="alert">
+      <strong>{{ message[1] }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
 </div>

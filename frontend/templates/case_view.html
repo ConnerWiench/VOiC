@@ -139,6 +139,11 @@
             </tr>
           </thead>
           <tbody>
+            <tr class="card-body">
+              <td>Test Name</td>
+              <td>Other</td>
+              <td>Pending</td>
+            </tr>
             {% for doc in docs %}
             <tr class="card-body">
               <td>{{ doc[0] }}</td>
@@ -148,9 +153,14 @@
             {% endfor %}
             <tr class="card-footer">
               <form method="POST" action="/case_view/{{ case[0] }}/create_doc">
-                <div class="form-group">
-                  
-                </div>
+                <td class="form-group">
+                  <label for="new_doc">Add New Document:</label>
+                  <input type="text" name="new_doc" class="form-control" placeholder="Document Title" required>
+                </td>
+                <td></td>
+                <td class="align-bottom">
+                  <button type="submit" class="btn btn-primary">Add</button>
+                </td>
               </form>
             </tr>
           </tbody>
