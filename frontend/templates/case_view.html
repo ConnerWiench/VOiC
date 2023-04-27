@@ -27,7 +27,8 @@
           {% if (role == 'Judge') or (role == 'Clerk') %}
           <div class="col">
             <form method="POST" action="/case_view/{{ case[0] }}/remove_user">
-              <button type="submit" class="btn btn-sm btn-danger border-bottom" name="rem_user" value="{{ person[0] }}">Remove</button>
+              <button type="submit" class="btn btn-sm btn-danger border-bottom" name="rem_user"
+                value="{{ person[0] }}">Remove</button>
             </form>
           </div>
           {% endif %}
@@ -38,7 +39,7 @@
         <form method="POST" action="/case_view/{{ case[0] }}/add_user">
           <div class="form-group">
             <label for="new_user">Add new user:</label>
-            <input type="text" name="new_user" class="form-control" required>
+            <input type="text" name="new_user" class="form-control" placeholder="Email" required>
           </div>
           <div class="form-group">
             <label for="new_role">Role:</label>
@@ -54,6 +55,50 @@
         {% endif %}
       </div>
     </div>
+    <div class="card mb-3">
+      <div class="card-header">
+        <h5 class="card-title">Verdict and Release</h5>
+      </div>
+      <div>
+        {% if 'Judge' not in docs|selectattr(1)|list %}
+        <div class="card-body">Waiting on Judge's document.</div>
+        {% else %}
+        {% if role == 'Judge' %}
+        <div class="card-body">
+          <form method="POST" action="/case_view/{{ case[0] }}/verdict">
+            <div class="form-group">
+              <label for="new_verdict">Verdict: </label>
+              <select name="new_verdict" class="form-control" required>
+                {% if not case[3] %}
+                <option value="" disabled selected>None</option>
+                {% endif %}
+                <option value="Guilty" {{ 'selected' if case[3]=='Guilty' else '' }}>Guilty</option>
+                <option value="Not Guilty" {{ 'selected' if case[3]=='Not Guilty' else '' }}>Not Guilty</option>
+              </select>
+
+              <label for="new_release">Status: </label>
+              <select name="new_release" class="form-control" required>
+                <option value="0" {{ 'selected' if not case[7] else '' }}>Unreleased</option>
+                <option value="1" {{ 'selected' if case[7] else '' }}>Released</option>
+              </select>
+            </div> <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+        {% else %}
+        <div class="card-body">
+          <div>Verdict: {{ case[3] }}</div>
+          {% if case[7] %}
+          <div>Released: True</div>
+          {% else %}
+          <div>Released: False</div>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+
+    </div>
   </div>
   <div class="col-md-9">
     <div class="card mb-3">
@@ -64,19 +109,20 @@
         <h6 class="card-subtitle mb-2 text-muted">Created: {{ case[4] }}</h6>
         <h6 class="card-subtitle mb-2 text-muted">Charge: {{ case[1] }}</h6>
         <h6 class="card-subtitle mb-2 text-muted">Article: {{ case[2] }}</h6>
-        <h6 class="card-subtitle mb-2 text-muted">Verdict: {{ case[3] }}</h6>
-        
+
         <div class="card-footer">
           <table class="table table-borderless">
             <tr>
               {% if case[5] %}
               <td>
-                <a class="btn btn-secondary float-start" href="{{ url_for('case_view', case_id=case[5]) }}">Preceding Case</a>
+                <a class="btn btn-secondary float-start" href="{{ url_for('case_view', case_id=case[5]) }}">Preceding
+                  Case</a>
               </td>
               {% endif %}
               {% if case[6] %}
               <td>
-                <a class="btn btn-secondary float-end" href="{{ url_for('case_view', case_id=case[6]) }}">Succeeding Case</a>
+                <a class="btn btn-secondary float-end" href="{{ url_for('case_view', case_id=case[6]) }}">Succeeding
+                  Case</a>
               </td>
               {% endif %}
             </tr>

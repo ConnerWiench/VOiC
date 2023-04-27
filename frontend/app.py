@@ -494,6 +494,36 @@ def case_view_add_user(case_id):
     flash('User added', 'success')
     return redirect(f'/case_view/{case_id}')
 
+@app.route('/case_view/<case_id>/verdict', methods=['POST'])
+def case_view_change_verdict(case_id):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userRole = cursor.fetchone()[0]
+    
+    if not userRole == "Judge":
+        print("User does not have permission to do this.")
+        flash('Permission Denied', 'danger')
+        return redirect(f'/case_view/{case_id}')
+
+    new_release = request.form["new_release"]
+    new_verdict = request.form["new_verdict"]
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE court_case\n"\
+                            f"SET case_released={new_release}, case_verdict='{new_verdict}'\n"\
+                            f"WHERE case_number={case_id};")
+    except Exception as e:
+        print(f"Error: {e}\nCancelling...")
+        flash('An error has occured', 'danger')
+
+    conn.commit()
+    flash('Status Updated', 'success')
+    return redirect(f'/case_view/{case_id}')
+
 @app.route('/profile')
 def profile():
     # get user_name from session object

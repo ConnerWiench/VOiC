@@ -46,6 +46,11 @@
   transition: background-position 0.3s ease-out;
 }
 
+.card-voic:not(hover) {
+  background-position: right;
+  transition: background-position 0.3s ease-out;
+}
+
 /*Sign up*/
 /*Sign up*/
 html,
