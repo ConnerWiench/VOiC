@@ -1,40 +1,4 @@
 {% extends 'layout2.html'%} {%block content%}
-<!-- <body>
-  <h1 class="text-center">Create Court Case</h1>
-  <div class="container-md">
-    <form method="POST" action="/api/case_create">
-      <div class="mb-3">
-        <label for="form_id" class="form-label">Case ID Number</label>
-        <input type="text" class="form-control" id="form_id" name="form_id">
-      </div>
-      <div class="mb-3">
-        <label for="form_charge" class="form-label">Case Charge</label>
-        <input type="text" class="form-control" id="form_charge" name="form_charge">
-      </div>
-      <div class="mb-3">
-        <label for="form_document" class="form-label">Case Document Title</label>
-        <input type="text" class="form-control" id="form_document" name="form_document">
-      </div>
-      <div class="mb-3">
-        <label for="form_level" class="form-label">Case Access Level</label>
-        <select class="form-select" id="form_level" name="form_level">
-          {% for role in roles %}
-          <option value="{{ role }}">{{ role }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="form_verdict" class="form-label">Case Verdict</label>
-        <select class="form-select" id="form_verdict" name="form_verdict">
-          <option value="not guilty">Not Guilty</option>
-          <option value="guilty">Guilty</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
-</body> -->
 
 <!DOCTYPE html>
 <html>
@@ -63,39 +27,11 @@
         <select class="form-select" name="case_article" required>
           <option value="" disabled selected>Select Article</option>
           {% for article in articles %}
-          <option value="{{ article }}">{{ article }}</article></option>
+          <option value="{{ article }}">{{ article }}</article>
+          </option>
           {% endfor %}
         </select>
       </div>
-      <!-- <br><h5><a href="{{ url_for('document') }}">Click to View or Edit your Case</a></h5> -->
-      <!--
-      Link trigger modal 
-      <a href="#" class="text-decoration-none text-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        <u>Who can?</u>
-      </a>
-
-      
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Who can edit or add a case?</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <ul>
-                <li>Public - Can view all documents only after it has become public.</li>
-                <li>Lawyer - Can write/create their own briefs and read all others.</li>
-                <li>Cleric - Can view all documents and approve/deny any until released.</li>
-                <li>Judge - Read/writes the verdict document and can read any docs. </li>
-              </ul>            
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>-->
 
       <div class="form-group">
         <label for="case_proceed_number">Case Preceeding Number (Optional):</label>
@@ -124,6 +60,7 @@
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </div>
+
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   <script>
     document.getElementById("add-user").addEventListener("click", function () {
@@ -144,5 +81,5 @@
 
 </html>
 
-
 {%endblock content%}
+{% include 'flash_footer.html' %}

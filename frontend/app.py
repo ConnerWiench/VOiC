@@ -153,7 +153,7 @@ def api_log_in():
     
     if check_password_hash(str(data[1]), _password):
         session['user'] = data[0]
-        flash('Successful Login!')
+        flash('Successful Login!', 'success')
         print('Successful Login!')
         return redirect('/case_list')
     else:
@@ -165,7 +165,7 @@ def api_log_in():
 @app.route('/api/log_out')
 def api_log_out():
     session.pop('user')
-
+    flash('Logged Out', 'success')
     return redirect('/')
 
 
@@ -302,6 +302,7 @@ def case_create():
                         f"WHERE user_name = '{user}';")
         level = cursor.fetchone()[0]
     if level != "Judge" and level != "Clerk":
+        flash('Permission Denied', 'danger')
         return redirect("/case_list")
 
     return render_template("case_create.html", title='Create Case', roles=COURT_ROLES, articles=CASE_ARTICLES,form=form)
@@ -322,6 +323,7 @@ def api_case_create():
             and _case_user_created):
         print("All Fields need to be filled")
         # Add Flash Error Statement Here
+        flash("All fields need to be filled.", "danger")
         return redirect('/case_create')
     
     # If _case_preceed is empty, change to NULL so mysql knows its null
@@ -335,6 +337,7 @@ def api_case_create():
     if userLevel != "Judge" and userLevel != "Clerk":
         print(f"An Access Level Error has Occurred: {userLevel}")
         # Add Flash Error Here
+        flash('User does not have access to create.', 'danger')
         return redirect('/case_create')
 
     #Checks if users exist
@@ -345,6 +348,7 @@ def api_case_create():
                             f"WHERE user_name = '{user}';")
             if cursor.fetchone() is None:
                 print("Invalid user(s)")
+                flash("Invalild user(s) in case.", "danger")
                 return redirect("/case_create")
 
     # Attempts to add case
@@ -356,7 +360,10 @@ def api_case_create():
                             f"'{_case_article}', '{_case_time_created}', {_case_preceed});")
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
-        # Add Flash Error Window
+        if 'Duplicate' in str(e):
+            flash('Case already exists', 'danger')
+        else:
+            flash('An error has occurred', 'danger')
         return redirect("/case_create")
     
     # Attaches users to case using junction table
@@ -369,6 +376,7 @@ def api_case_create():
     except Exception as e:
         print(f"Error Found: {e}\nCancelling...")
         # Add Flash Error Window
+        flash("An error has occured.")
         return redirect("/case_create")
     # Commit new case to database and send user to case edit page
     os.mkdir(f"{DOCUMENT_PATH}/{_case_id}")
@@ -401,6 +409,7 @@ def case_view(case_id):
     
     if released == 0 and userRole is None:
         print("User does not have permission for this case.")
+        flash("Case Access Denied", 'danger')
         return redirect('/case_list')
     # ----- End Gate -----
 
@@ -446,7 +455,10 @@ def case_view_remove_user(case_id):
                             f"AND junction_user='{rem_user}';")
     except Exception as e:
         print(f"Error: {e}\nCancelling...")
-        
+        return redirect(f'/case_view/{case_id}')
+    
+    conn.commit()
+    flash('User removed', 'success')
     return redirect(f'/case_view/{case_id}')
         
 @app.route('/case_view/<case_id>/add_user', methods=["POST"])
@@ -460,6 +472,7 @@ def case_view_add_user(case_id):
     
     if not ((userRole == "Judge") or (userRole == "Clerk")):
         print("User does not have permission to do this.")
+        flash('Permission Denied', 'danger')
         return redirect(f'/case_view/{case_id}')
 
     new_user = request.form["new_user"]
@@ -472,8 +485,13 @@ def case_view_add_user(case_id):
                             f"VALUES ('{new_user}', '{new_role}', {case_id});")
     except Exception as e:
         print(f"Error: {e}\nCancelling...")
+        if 'Duplicate' in str(e):
+            flash('User already exist', 'danger')
+        else:
+            flash('An error has occured', 'danger')
 
-        
+    conn.commit()
+    flash('User added', 'success')
     return redirect(f'/case_view/{case_id}')
 
 @app.route('/profile')
@@ -509,6 +527,7 @@ def update_profile():
         cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer,address1, address2, postcode, user_name))
         conn.commit()
 
+    flash('Profile Updated!', 'success')
     return redirect(url_for('profile'))
 
 # ----- Normal Functions ----- (Move to different file eventually)
