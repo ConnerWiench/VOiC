@@ -68,6 +68,22 @@
                                     <input type="text" class="form-control" name="answer" placeholder="Enter your Answer" value="{{ user_answer }}">
                                 </div>
                             </div>
+                            <br>
+                            <button type="button" id="manage-password-btn">Manage Password</button>
+                                <div id="password-popup">
+                                    <h2>Change Password</h2>
+                                    <form>
+                                        <label for="old-password">Current Password:</label>
+                                        <input name="old-password" type="password" id="old-password" placeholder="Enter Your Current Password *" required class="form-control"/>
+                                        <label for="new-password">New Password:</label>
+                                        <input name="new-password" type="password" id="new-password" placeholder="New Password *" required class="form-control"/>
+                                        <label for="confirm_password">Confirm New Password:</label>
+                                        <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm New Password *" required class="form-control"/>
+                                        <button type="submit" id="PasswordSubmit" >Save</button>
+                                        <button type="button" class="close">Close</button>
+                                    </form>     
+                                </div>
+
                             <div class="mt-5 text-center">
                                 <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
                             </div>
@@ -76,6 +92,24 @@
                 </div>
             </div>
         </div>
+        <script>
+            // Get the button and pop-up elements
+            var managePasswordBtn = document.getElementById("manage-password-btn");
+            var passwordPopup = document.getElementById("password-popup");
+    
+            // Add event listener to the Manage Password button
+            managePasswordBtn.addEventListener("click", function() {
+                // Show the pop-up
+                passwordPopup.style.display = "block";
+            });
+    
+            // Add event listener to the Close button
+            var closeBtn = passwordPopup.querySelector(".close");
+            closeBtn.addEventListener("click", function() {
+                // Hide the pop-up
+                passwordPopup.style.display = "none";
+            });
+        </script>
 </body>
 {% endblock %}
 {% include 'flash_footer.html' %}

@@ -544,6 +544,7 @@ def profile():
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     user_name = session.get('user')
+    token = session.get('token')
     if 'user_name' in request.form:
         user_name = request.form['user_name']
     first_name = request.form['first_name']
@@ -554,9 +555,31 @@ def update_profile():
     address1=request.form['address1']
     address2=request.form['address2']
     postcode=request.form['postcode']
+    password = None
+    if "password" in request.form:
+        password = request.form["password"]
+    confirm_password = request.form["confirm_password"]
+    token1 = str(uuid.uuid4())
+    
+    if password != confirm_password:
+        flash("Password do not match", 'danger')
+    password = generate_password_hash(password)
 
     print(first_name)
     print(address1)
+    print(password)
+    
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
+        data = cursor.fetchone()
+        
+    if data:
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
+        conn.commit()
+        flash("Your password successfully updated", 'success')
+    else:
+        flash("Your token is invalid",'danger')  
     
     with conn.cursor() as cursor:
         cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer,address1, address2, postcode, user_name))
@@ -584,5 +607,5 @@ if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
         os.mkdir(f"{DOCUMENT_PATH}")
         
-    app.run(debug=True, port = 1111)
+    app.run(debug=True, port = 1211)
 conn.close()
