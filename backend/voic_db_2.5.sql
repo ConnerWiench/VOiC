@@ -39,6 +39,24 @@ CREATE TABLE IF NOT EXISTS `voic_db`.`court_case` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `voic_db`.`court_article`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS voic_db.court_article (
+  `case_number` INT NOT NULL AUTO_INCREMENT,
+  `case_article` VARCHAR(45) NOT NULL,
+  `case_chapter` VARCHAR(45) NOT NULL,
+  `case_verdict` VARCHAR(45) NULL,
+  `case_number` INT NOT NULL,
+  PRIMARY KEY (id),
+  INDEX fk_article_case_number_idx (case_number ASC) VISIBLE,
+  CONSTRAINT fk_article_case_number
+  FOREIGN KEY (case_number)
+  REFERENCES voic_db.court_case (case_number)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `voic_db`.`court_user`
@@ -60,7 +78,6 @@ CREATE TABLE IF NOT EXISTS `voic_db`.`court_user` (
   PRIMARY KEY (`user_name`),
   UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC) VISIBLE)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `voic_db`.`court_docs`
