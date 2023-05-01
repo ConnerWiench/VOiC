@@ -555,19 +555,20 @@ def update_profile():
     address1=request.form['address1']
     address2=request.form['address2']
     postcode=request.form['postcode']
+    
     password = None
     if "password" in request.form:
         password = request.form["password"]
-    confirm_password = request.form["confirm_password"]
-    token1 = str(uuid.uuid4())
-    
-    if password != confirm_password:
-        flash("Password do not match", 'danger')
-    password = generate_password_hash(password)
+        confirm_password = request.form["confirm_password"]
+        if password != confirm_password:
+            flash("Password do not match", 'danger')
+        else:
+            password = generate_password_hash(password)
 
+    token1 = str(uuid.uuid4())
     print(first_name)
     print(address1)
-    print(password)
+    print(token1)
     
     with conn.cursor() as cursor:
         cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
