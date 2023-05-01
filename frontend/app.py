@@ -565,6 +565,11 @@ def update_profile():
     flash('Profile Updated!', 'success')
     return redirect(url_for('profile'))
 
+@app.route('/document')
+def document():
+
+    return render_template('document.html',title= 'Document')
+
 # ----- Normal Functions ----- (Move to different file eventually)
 
 def convert_to_alpnum(oldStr):
@@ -573,12 +578,6 @@ def convert_to_alpnum(oldStr):
         if i.isalnum() or i == ' ':
             newStr += i
     return newStr
-
-@app.route('/document')
-def document():
-
-    return render_template('document.html',title= 'Document')
-
 
 if __name__ == '__main__':
     if not os.path.exists(f"{DOCUMENT_PATH}"):
