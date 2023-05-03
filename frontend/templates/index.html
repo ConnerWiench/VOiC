@@ -37,6 +37,12 @@
     body { While the majority of documents used in offices and governments today are digital, the way they are managed is often outdated. These documents are crucial as they serve as a record of the evolution of thoughts, laws, and decisions throughout history. While paper-based documents have been the traditional preservation medium, they are susceptible to loss, destruction, and theft. Digital documents, on the other hand, are less prone to physical deterioration, but are vulnerable to cybercrime. However, with appropriate safeguards in place, digital documents can be nearly indestructible. Unfortunately, most offices and governments lack a robust document management system to handle these important files. This is where the Virtual Office in the Cloud, or VOiC for short, comes in. VOiC is a web-based document processing and management system that allows for the creation, sharing, querying, and updating of office documents. It also supports decision workflows, virtual offices, and privacy and provenance based on role-based authorization. The system is built upon a recent model for document management in virtual offices, ensuring that it is modern and up-to-date. 
       font-family: Arial, sans-serif;
     }
+    footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+   }
+   
     
   </style>
 </head>
@@ -67,32 +73,45 @@
       </div>
     </div>
   </nav>
-
-  <div class="container my-5">
+  
     <div class="row align-items-center justify-content-center">
       <div class="col-md-6 animate__animated animate__fadeInLeft">
+        <br>
         <img src="{{ url_for('static', filename='img/cover.png') }}" alt="Cover Picture" class="img-fluid d-block mx-auto" />
       </div>
       <div class="col-md-6">
         <h1 class="display-4">
           <b>V</b>irtual <b>O</b>ffice in the <b>C</b>loud
         </h1>
-        <p class="lead">
-          While the majority of documents used in offices and governments today are digital, the way they are managed is often outdated. These documents are crucial as they serve as a record of the evolution of thoughts, laws, and decisions throughout history. While paper-based documents have been the traditional preservation medium, they are susceptible to loss, destruction, and theft. Digital documents, on the other hand, are less prone to physical deterioration, but are vulnerable to cybercrime. However, with appropriate safeguards in place, digital documents can be nearly indestructible. Unfortunately, most offices and governments lack a robust document management system to handle these important files. This is where the Virtual Office in the Cloud, or VOiC for short, comes in. VOiC is a web-based document processing and management system that allows for the creation, sharing, querying, and updating of office documents. It also supports decision workflows, virtual offices, and privacy and provenance based on role-based authorization. The system is built upon a recent model for document management in virtual offices, ensuring that it is modern and up-to-date.
+        <p style="text-align:left;" class="lead">
+            While the majority of documents used in offices and governments today are digital, the way they are managed is often outdated. 
+            These documents are crucial as they serve as a record of the evolution of thoughts, laws, and decisions throughout history. 
+            While paper-based documents have been the traditional preservation medium, they are susceptible to loss, destruction, and theft. 
+            Digital documents, on the other hand, are less prone to physical deterioration, but are vulnerable to cybercrime. 
+            However, with appropriate safeguards in place, digital documents can be nearly indestructible. Unfortunately, most offices and 
+            governments lack a robust document management system to handle these important files. This is where the Virtual Office in the Cloud, 
+            or VOiC for short, comes in. VOiC is a web-based document processing and management system that allows for the creation, sharing, 
+            querying, and updating of office documents. It also supports decision workflows, virtual offices, and privacy and provenance based 
+            on role-based authorization. The system is built upon a recent model for document management in virtual offices, ensuring that it is modern and up-to-date.
         </p>
-        <a href="{{ url_for('log_in') }}">
-          <button type="button" class="btn btn-primary btn-lg">
-            Log in
-          </button>
-        </a>
-        <a href="{{ url_for('sign_up') }}">
-          <button type="button" class="btn btn-secondary btn-lg">
-            Sign Up
-          </button>
-        </a>
+        <div class="d-flex justify-content-center">
+          <a href="{{ url_for('log_in') }}">
+            <button type="button" class="btn btn-primary btn-lg mx-3">
+              Log in
+            </button>
+          </a>
+          <a href="{{ url_for('sign_up') }}">
+            <button type="button" class="btn btn-secondary btn-lg">
+              Sign Up
+            </button>
+          </a>
+        </div>
+        
       </div>
     </div>
-  </div>
+</div>
+<div class="footer bg-white text-black text-center py-3">
+  &copy; 2023 Created by Conner Wiench and Shashwot Niraula
 </div>
 </body>
 </html>

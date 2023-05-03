@@ -19,6 +19,17 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+    <style>
+      .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #f2f2f2;
+      color: #000000;
+      padding: 20px;
+      text-align: center;
+    }
+    </style>
   </head>
 
   <body>
@@ -71,5 +82,8 @@
     </nav>
 
     {%block content%} {%endblock content%}
+    <div class="footer text-black text-center py-3">
+      <br>&copy; 2023 Created by Conner Wiench and Shashwot Niraula
+    </div>
   </body>
 </html>
