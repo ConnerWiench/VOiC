@@ -6,22 +6,24 @@
 
 {% block content %}
 <div class="col-md-9 register-right">
-  <h3 class="register-heading">Forgot Password</h3>
+  <div class="text-left">
+    <h3 class="register-heading">Forgot Password</h3>
+  </div>
   <form method="post">
     <div class="row register-form">
       <div class="col-md-6">
         <div class="form-group">
-              <input
-                type="email"
-                name="username"
-                id="inputAddress"
-                class="form-control"
-                placeholder="Enter your email" required
-              />
-          </div>
+          <input
+            type="email"
+            name="username"
+            id="inputAddress"
+            class="form-control"
+            placeholder="Enter your email" required
+          />
         </div>
-      <input type="submit" id="PasswordSubmit" class="btnRegister" value="Submit"/>
+      </div>
+      <input type="submit" id="PasswordSubmit" class="btn btn-primary" value="Submit" style="height: 50%; width: 20%;">
+    </div>
   </form>
 </div>
-
 {% endblock %}
