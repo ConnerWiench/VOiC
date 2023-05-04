@@ -34,7 +34,7 @@ ENGINE = InnoDB;
 -- Table `voic_db`.`court_article`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS voic_db.court_article (
+CREATE TABLE IF NOT EXISTS `voic_db`.`court_article` (
   `case_number` INT NOT NULL AUTO_INCREMENT,
   `case_article` VARCHAR(45) NOT NULL,
   `case_chapter` VARCHAR(45) NOT NULL,

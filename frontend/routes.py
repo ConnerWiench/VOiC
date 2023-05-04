@@ -486,6 +486,42 @@ def case_view_change_verdict(case_id):
     flash('Status Updated', 'success')
     return redirect(f'/case_view/{case_id}')
 
+@app.route('/case_view/<case_id>/create_doc', methods=['POST'])
+def case_view_add_doc(case_id):
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userRole = cursor.fetchone()
+        
+        if not userRole:
+            print("User does not have permission to do this.")
+            flash('Permission Denied', 'danger')
+            return redirect(f'/case_view/{case_id}')
+        else:
+            userRole = userRole[0]
+
+    title = request.form["new_doc"]
+
+    user = session.get('user')
+    path = DOCUMENT_PATH + case_id + title
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("INSERT INTO court_docs"\
+                            "(docs_title, docs_path, docs_type, docs_case, docs_author)\n"\
+                            f"VALUES('{title}', '{path}', '{userRole}', {case_id}, '{user}');")
+    except Exception as e:
+        print(f'Error: {e}')
+        flash('An error has occured', 'danger')
+        return redirect(f'/case_view/{case_id}')
+    
+    conn.commit()
+    return redirect(f'/document/{case_id}/{title}')
+        
+
+
+
 @app.route('/profile')
 def profile():
     # get user_name from session object
@@ -546,6 +582,48 @@ def update_profile():
     flash('Profile Updated!', 'success')
     return redirect(url_for('profile'))
 
+@app.route('/document/<case_id>/<doc_title>', methods=['GET', 'POST'])
+def document(case_id, doc_title):
+    # ----- Gate Conditions -----
+    user = session.get('user')
+    if user is None:
+        print("Redirecting...")
+        return redirect('/log_in')
+    
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT case_released\n"\
+                        "FROM court_case\n"\
+                        f"WHERE case_number='{case_id}';")
+        released = cursor.fetchone()
+        if released:
+            released = released[0]
+        else:
+            flash('Case does not exists', 'danger')
+            return redirect('/case_list')
+        
+        cursor.execute("SELECT docs_title\n"\
+                        "FROM court_docs\n"\
+                        f"WHERE docs_title='{doc_title}';")
+        validDoc = cursor.fetchone()
+        if not validDoc:
+            flash('Document does not exists', 'danger')
+            return redirect('/case_list')
+
+        cursor.execute("SELECT junction_role\n"\
+                        "FROM junction_case_user\n"\
+                        f"WHERE junction_case={case_id}\n"\
+                        f"AND junction_user='{session.get('user')}';")
+        userRole = cursor.fetchone()
+        if userRole is not None:
+            userRole = userRole[0]
+        else:
+            flash('Case Access Denied', 'danger')
+            return redirect(f'/case_view/{case_id}')
+        
+    conn.commit()
+    return render_template('document.html', title=f'{doc_title}')
+
+
 # ----- Normal Functions ----- (Move to different file eventually)
 
 def convert_to_alpnum(oldStr):
@@ -554,7 +632,3 @@ def convert_to_alpnum(oldStr):
         if i.isalnum() or i == ' ':
             newStr += i
     return newStr
-
-@app.route('/document')
-def document():
-    return render_template('document.html',title= 'Document')

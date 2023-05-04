@@ -60,7 +60,7 @@
         <h5 class="card-title">Verdict and Release</h5>
       </div>
       <div>
-        {% if 'Judge' not in docs|selectattr(1)|list %}
+        {% if 'Judge' in docs|selectattr(1)|list %}
         <div class="card-body">Waiting on Judge's document.</div>
         {% else %}
         {% if role == 'Judge' %}
@@ -139,14 +139,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="card-body">
-              <td>Test Name</td>
-              <td>Other</td>
-              <td>Pending</td>
-            </tr>
             {% for doc in docs %}
             <tr class="card-body">
-              <td>{{ doc[0] }}</td>
+              <td><a href="/document/{{ case[0] }}/{{ doc[0] }}">{{ doc[0] }}</a></td>
               <td>{{ doc[1] }}</td>
               <td>{% if doc[2] %}Approved{% else %}Pending{% endif %}</td>
             </tr>
