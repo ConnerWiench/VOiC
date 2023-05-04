@@ -6,10 +6,24 @@
             <div class="row">
                 <div class="col-md-5 border-right">
                     <div class="p-3 py-5">
+                        <h1>Profile Settings</h1>
+                        <h2>Welcome {{ user_first }} {{ user_last }}!</h2>
+                        <button type="button" id="manage-password-btn">Manage Password</button>
+                                <div id="password-popup">
+                                    <h2>Change Password</h2>
+                                    <form>
+                                        <label for="old-password">Current Password:</label>
+                                        <input name="old-password" type="password" id="old-password" placeholder="Enter Your Current Password *" required class="form-control"/>
+                                        <label for="new-password">New Password:</label>
+                                        <input name="new-password" type="password" id="new-password" placeholder="New Password *" required class="form-control"/>
+                                        <label for="confirm_password">Confirm New Password:</label>
+                                        <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm New Password *" required class="form-control"/>
+                                        <button type="submit" id="PasswordSubmit" >Save</button>
+                                        <button type="button" class="close">Close</button>
+                                    </form>     
+                                </div>
                         <form method="POST" action="{{ url_for('update_profile') }}">
                             <div class="row mt-2">
-                                <h1>Profile Settings</h1>
-                                <h2>Welcome {{ user_first }} {{ user_last }}!</h2>
                                 <div class="col-md-6">
                                     <label class="labels">First Name</label>
                                     <input type="text" class="form-control" name="first_name" placeholder="First name" value="{{ user_first }}">
@@ -56,9 +70,9 @@
                                     <label class="labels">Security Question</label>
                                     <select class="form-control" name="question">
                                     <option value="">Select your question</option>
-                                    <option value="What is your Birthdate?" {% if user_question == "What is your Birthdate?" %}selected{% endif %}>What is your Birthdate?</option>
-                                    <option value="What is Your old Phone Number" {% if user_question == "What is Your old Phone Number" %}selected{% endif %}>What is Your old Phone Number</option>
-                                    <option value="What is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
+                                    <option value="What is your mother's maiden name?" {% if user_question == "What is your mother's maiden name?" %}selected{% endif %}>What is your mother's maiden name?</option>
+                                    <option value="What was your favorite food as a child?" {% if user_question == "What was your favorite food as a child?" %}selected{% endif %}>What was your favorite food as a child?</option>
+                                    <option value="WWhat is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
                                     <option value="Other" {% if user_question == "Other" %}selected{% endif %}>Other</option>
                                     </select>
                                 </div>
@@ -69,46 +83,34 @@
                                 </div>
                             </div>
                             <br>
-                            <button type="button" id="manage-password-btn">Manage Password</button>
-                                <div id="password-popup">
-                                    <h2>Change Password</h2>
-                                    <form>
-                                        <label for="old-password">Current Password:</label>
-                                        <input name="old-password" type="password" id="old-password" placeholder="Enter Your Current Password *" required class="form-control"/>
-                                        <label for="new-password">New Password:</label>
-                                        <input name="new-password" type="password" id="new-password" placeholder="New Password *" required class="form-control"/>
-                                        <label for="confirm_password">Confirm New Password:</label>
-                                        <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm New Password *" required class="form-control"/>
-                                        <button type="submit" id="PasswordSubmit" >Save</button>
-                                        <button type="button" class="close">Close</button>
-                                    </form>     
-                                </div>
-
+                            
                             <div class="mt-5 text-center">
                                 <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
                             </div>
+
                         </form>
                     </div>
                 </div>
             </div>
         </div>
         <script>
-            // Get the button and pop-up elements
-            var managePasswordBtn = document.getElementById("manage-password-btn");
-            var passwordPopup = document.getElementById("password-popup");
-    
-            // Add event listener to the Manage Password button
-            managePasswordBtn.addEventListener("click", function() {
-                // Show the pop-up
-                passwordPopup.style.display = "block";
-            });
-    
-            // Add event listener to the Close button
-            var closeBtn = passwordPopup.querySelector(".close");
-            closeBtn.addEventListener("click", function() {
-                // Hide the pop-up
-                passwordPopup.style.display = "none";
-            });
+        // Get the button and pop-up elements
+        var managePasswordBtn = document.getElementById("manage-password-btn");
+        var passwordPopup = document.getElementById("password-popup");
+
+        // Add event listener to the Manage Password button
+        managePasswordBtn.addEventListener("click", function() {
+            // Show the pop-up
+            passwordPopup.style.display = "block";
+        });
+
+        // Add event listener to the Close button
+        var closeBtn = passwordPopup.querySelector(".close");
+        closeBtn.addEventListener("click", function() {
+            // Hide the pop-up
+            passwordPopup.style.display = "none";
+        });
+    </script>
         </script>
 </body>
 {% endblock %}
