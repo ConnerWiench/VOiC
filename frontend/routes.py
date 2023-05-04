@@ -572,8 +572,8 @@ def update_profile():
             cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
         conn.commit()
         flash("Your password successfully updated", 'success')
-    else:
-        flash("Your token is invalid",'danger')  
+    #else:
+        #flash("Your token is invalid",'danger')  
     
     with conn.cursor() as cursor:
         cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer,address1, address2, postcode, user_name))
