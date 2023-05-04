@@ -115,15 +115,7 @@
     >
   </p>
 </div>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul class="flashes" style="color:red;">
-            {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
+
 
 <div class="footer text-black text-center py-3">
   <br>&copy; 2023 Created by Conner Wiench and Shashwot Niraula
@@ -145,3 +137,4 @@
   }
 </script>
 {%endblock content%}
+{% include 'flash_footer.html' %}

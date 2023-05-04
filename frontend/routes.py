@@ -29,7 +29,7 @@ def sign_up():
 
 @app.route('/api/sign_up', methods=['POST'])
 def api_sign_up():
-    print("API CALLED")
+    # Retrieve form data
     _username = request.form['signEmail']
     _first = request.form['signFirst']
     _last = request.form['signLast']
@@ -41,26 +41,30 @@ def api_sign_up():
     _answer = request.form['signAnswer']
     _created = time.strftime('%Y-%m-%d %H:%M:%S')
 
-    # Validate Values
+    # Validate form data
     if not (_username and _first and _last and _level and _password \
             and _conPassword and _phone and _question and _answer):
-        print("All fields need to be filled")
-        # Add Flash Error Here
-        flash("All fields need to be filled")
+        flash("All fields need to be filled", 'danger')
         return redirect('/sign_up')
     elif _password != _conPassword:
-        print("Passwords must Match")
-        # Add Flash Error Here
-        flash("Passwords must Match")
+        flash("Passwords must match", 'danger')
         return redirect('/sign_up')
 
-    # Hashes the password for proper security
+    # Check if email already exists in the database
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_name FROM court_user WHERE user_name = %s", (_username,))
+        result = cursor.fetchone()
+        if result:
+            flash("This email has already been registered", 'danger')
+            return redirect('/sign_up')
+
+    # Hash the password for proper security
     _hashed_password = generate_password_hash(_password)
 
     # Generate a unique token
     token = secrets.token_hex(16)
 
-    # Attempts to add user into database
+    # Attempt to add user into database
     try:
         with conn.cursor() as cursor:
             cursor.execute("INSERT INTO court_user(user_name, user_first, user_last, "\
@@ -73,9 +77,10 @@ def api_sign_up():
         print(f"Error Found: {e}\nCancelling...")
         return redirect('/sign_up')
     
-    # Commit changes to the database and send user to login on successful sign up.
+    # Commit changes to the database and redirect user to login on successful sign up.
     conn.commit()
-    return redirect('/log_in') # Some sort of redirect to login page
+    flash("You have successfully registered. Please log in.", 'success')
+    return redirect('/log_in')
 
 @app.route('/log_in')
 def log_in():
@@ -88,7 +93,7 @@ def api_log_in():
     _password = request.form['loginPassword']
 
     if not (_username and _password):
-        flash('All fields need to be filled')
+        flash('All fields need to be filled','danger')
         print('All fields need to be filled')
         return redirect('/log_in')
     
@@ -99,7 +104,7 @@ def api_log_in():
         data = cursor.fetchone()
 
     if data is None:
-        flash('Incorrect Email or Password')
+        flash('Incorrect Email or Password','danger')
         print('Incorrect Email or Password')
         return redirect('/log_in')
     
@@ -109,7 +114,7 @@ def api_log_in():
         print('Successful Login!')
         return redirect('/case_list')
     else:
-        flash('Incorrect Email or Password')
+        flash('Incorrect Email or Password','danger')
         print('Incorrect Email or Password')
         return redirect('/log_in')
 
@@ -143,7 +148,7 @@ def forgot():
             conn.commit()
             cursor.close()
         
-        flash("Email already sent to your email", 'success')
+        flash("Email sent to your email", 'success')
         return redirect('/log_in')
     
     else:

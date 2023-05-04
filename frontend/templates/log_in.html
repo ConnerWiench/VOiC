@@ -34,16 +34,6 @@
           <div id="recaptchaError" style="display: none; color: red;">Please complete the reCAPTCHA</div>
         </div>
         <input type="submit" id="loginSubmit" class="btnRegister" value="Log in"/>
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class="flashes">
-              {% for message in messages %}
-                <li class="{% if 'error' in message %}error-message{% endif %}">{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-        
       </div>
       
     </div>
@@ -70,3 +60,4 @@
 </script>
 
 {% endblock %}
+{% include 'flash_footer.html' %}

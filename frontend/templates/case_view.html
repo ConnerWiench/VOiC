@@ -60,7 +60,7 @@
         <h5 class="card-title">Verdict and Release</h5>
       </div>
       <div>
-        {% if 'Judge' in docs|selectattr(1)|list %}
+        {% if 'Judge' not in docs|selectattr(1)|list %}
         <div class="card-body">Waiting on Judge's document.</div>
         {% else %}
         {% if role == 'Judge' %}
