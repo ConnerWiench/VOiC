@@ -1,0 +1,2 @@
+# Prevent upload of .env file for security purposes
+**/.env

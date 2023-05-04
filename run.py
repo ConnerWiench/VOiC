@@ -1,4 +1,4 @@
-#!../voic_venv/bin/python3
+#!voic_venv/bin/python3
 from flask import Flask
 from frontend.routes import *
 
