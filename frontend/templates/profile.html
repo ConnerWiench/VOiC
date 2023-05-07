@@ -8,22 +8,13 @@
                     <div class="p-3 py-5">
                         <h1>Profile Settings</h1>
                         <h2>Welcome {{ user_first }} {{ user_last }}!</h2>
-                        <button type="button" id="manage-password-btn">Manage Password</button>
-                                <div id="password-popup">
-                                    <h2>Change Password</h2>
-                                    <form>
-                                        <label for="old-password">Current Password:</label>
-                                        <input name="old-password" type="password" id="old-password" placeholder="Enter Your Current Password *" required class="form-control"/>
-                                        <label for="new-password">New Password:</label>
-                                        <input name="new-password" type="password" id="new-password" placeholder="New Password *" required class="form-control"/>
-                                        <label for="confirm_password">Confirm New Password:</label>
-                                        <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm New Password *" required class="form-control"/>
-                                        <button type="submit" id="PasswordSubmit" >Save</button>
-                                        <button type="button" class="close">Close</button>
-                                    </form>     
-                                </div>
-                        <form method="POST" action="{{ url_for('update_profile') }}">
-                            <div class="row mt-2">
+                        <form method="POST" action="{{ url_for('update_profile') }}">      
+                            <div class="col-md-12">
+                                <!--<label class="labels">Password</label>
+                                <input type="password" class="form-control" name="password" placeholder="Enter Password" value="">
+                                >-->
+                            </div>    
+                              <div class="row mt-2">
                                 <div class="col-md-6">
                                     <label class="labels">First Name</label>
                                     <input type="text" class="form-control" name="first_name" placeholder="First name" value="{{ user_first }}">
@@ -37,7 +28,7 @@
                                 <div class="col-md-12">
                                     <label class="labels">Email ID</label>
                                     <input type="email" class="form-control" name="email" placeholder="Enter your email" value="{{ user_name }}" readonly>
-                                </div>                                
+                                </div>
                                 <!--<div class="col-md-12">
                                     <label class="labels">Your Role</label>
                                     <select class="form-control" name="signLevel" id="signLevel">
@@ -72,22 +63,35 @@
                                     <option value="">Select your question</option>
                                     <option value="What is your mother's maiden name?" {% if user_question == "What is your mother's maiden name?" %}selected{% endif %}>What is your mother's maiden name?</option>
                                     <option value="What was your favorite food as a child?" {% if user_question == "What was your favorite food as a child?" %}selected{% endif %}>What was your favorite food as a child?</option>
-                                    <option value="WWhat is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
+                                    <option value="What is your Pet Name?" {% if user_question == "What is your Pet Name?" %}selected{% endif %}>What is your Pet Name?</option>
                                     <option value="Other" {% if user_question == "Other" %}selected{% endif %}>Other</option>
                                     </select>
                                 </div>
-                                
                                 <div class="col-md-12">
                                     <label class="labels">Answer</label>
                                     <input type="text" class="form-control" name="answer" placeholder="Enter your Answer" value="{{ user_answer }}">
                                 </div>
                             </div>
-                            <br>
-                            
                             <div class="mt-5 text-center">
                                 <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
                             </div>
 
+                        </form>
+                        <form method="POST" action="{{ url_for('change_password') }}">    
+                            <button type="button" id="manage-password-btn">Manage Password</button>
+                            <div id="password-popup">
+                                <h2>Change Password</h2>
+                                <form>
+                                    <label for="old-password">Current Password:</label>
+                                <input type="password" class="form-control" name="password" placeholder="Enter Password" value="">
+                                <label for="new-password">New Password:</label>
+                                <input name="new_password" type="password" id="new-password" placeholder="New Password *"  class="form-control"/>
+                                <label for="confirm_password">Confirm New Password:</label>
+                                <input name="confirm_password" type="password" id="confirm_password" placeholder="Confirm New Password *"  class="form-control"/>                            
+                                <button type="submit" id="PasswordSubmit" >Save</button>
+                                <button type="button" class="close">Close</button>
+                                </form>     
+                            </div>     
                         </form>
                     </div>
                 </div>

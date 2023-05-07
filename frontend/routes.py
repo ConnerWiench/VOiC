@@ -7,6 +7,7 @@ import time
 import os
 import uuid
 import secrets
+import re
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from frontend.models import get_db
@@ -486,60 +487,62 @@ def case_view_change_verdict(case_id):
     flash('Status Updated', 'success')
     return redirect(f'/case_view/{case_id}')
 
-@app.route('/case_view/<case_id>/create_doc', methods=['POST'])
-def case_view_add_doc(case_id):
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT junction_role\n"\
-                        "FROM junction_case_user\n"\
-                        f"WHERE junction_case={case_id}\n"\
-                        f"AND junction_user='{session.get('user')}';")
-        userRole = cursor.fetchone()
-        
-        if not userRole:
-            print("User does not have permission to do this.")
-            flash('Permission Denied', 'danger')
-            return redirect(f'/case_view/{case_id}')
-        else:
-            userRole = userRole[0]
-
-    title = request.form["new_doc"]
-
-    user = session.get('user')
-    path = DOCUMENT_PATH + case_id + title
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("INSERT INTO court_docs"\
-                            "(docs_title, docs_path, docs_type, docs_case, docs_author)\n"\
-                            f"VALUES('{title}', '{path}', '{userRole}', {case_id}, '{user}');")
-    except Exception as e:
-        print(f'Error: {e}')
-        flash('An error has occured', 'danger')
-        return redirect(f'/case_view/{case_id}')
-    
-    conn.commit()
-    return redirect(f'/document/{case_id}/{title}')
-        
-
-
-
 @app.route('/profile')
 def profile():
-    # get user_name from session object
     user_name = session.get('user')
-    print(user_name)
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer, user_address1, user_address2, user_postcode, user_password FROM court_user WHERE user_name = %s", (user_name,))
+        data = cursor.fetchone()
+    if data:
+        return render_template('profile.html', title='Profile', user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6], address1=data[7], address2=data[8], postcode=data[9], password=data[10])
+    else:
+        return redirect('/log_in')
+
+
+@app.route('/change_password', methods=['POST'])
+def change_password():
+    user_name = session.get('user')
+    password = request.form.get('password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+      
+    # Retrieve stored password from database
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_password FROM court_user WHERE user_name = %s", (user_name,))
+        stored_password = cursor.fetchone()[0]
+
+    if not check_password_hash(stored_password, password):
+        # Password is incorrect, display error message
+        flash('Incorrect current password', 'danger')
+        return redirect(url_for('profile'))
+   
+    if new_password != confirm_password:
+        flash("Your new passwords and confirm password do not match", 'danger')
+        return redirect(url_for('profile'))
+    
+    new_password_hash = generate_password_hash(new_password)
+    
+    #For testing in teriminal
+    print('\n')
+    print('--------------Profile Test-------------------')
+    print('Entered password: '+password)
+    print('Stored password: '+stored_password)
+    print(new_password)
+    print(confirm_password)
+    print('New hashed password'+new_password_hash)
+    print('---------------------------------------------')
+    print('\n')
 
     with conn.cursor() as cursor:
-        cursor.execute("SELECT user_name,user_first,user_last,user_level, user_phone, user_question, user_answer, user_address1, user_address2, user_postcode FROM court_user WHERE user_name = %s", (user_name,))
-        data = cursor.fetchone()
-        print(data)
-    return render_template('profile.html',title= 'Profile' ,user_name=data[0], user_first=data[1], user_last=data[2], user_level=data[3], user_phone=data[4], user_question=data[5], user_answer=data[6],address1=data[7], address2=data[8], postcode=data[9])
+        cursor.execute("UPDATE court_user SET user_password=%s WHERE user_name=%s", (new_password_hash, user_name))
+        conn.commit()
+        flash('Your password has been changed', 'success')
+
+    return redirect(url_for('profile'))
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     user_name = session.get('user')
-    token = session.get('token')
-    if 'user_name' in request.form:
-        user_name = request.form['user_name']
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     phone_number = request.form['phone_number']
@@ -548,80 +551,16 @@ def update_profile():
     address1=request.form['address1']
     address2=request.form['address2']
     postcode=request.form['postcode']
-    
-    password = None
-    if "password" in request.form:
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
-        if password != confirm_password:
-            flash("Password do not match", 'danger')
-        else:
-            password = generate_password_hash(password)
 
-    token1 = str(uuid.uuid4())
-    print(first_name)
-    print(address1)
-    print(token1)
+    print('First name: '+first_name)
+    print('Addredd1: '+address1)
     
     with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM court_user WHERE user_token =%s", [token])
-        data = cursor.fetchone()
-        
-    if data:
-        with conn.cursor() as cursor:
-            cursor.execute("UPDATE court_user SET user_token=%s, user_password=%s WHERE user_token=%s", [token1,password, token])
+        cursor.execute("UPDATE court_user SET user_first=%s, user_last=%s, user_phone=%s, user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (first_name, last_name, phone_number, question, answer, address1, address2, postcode, user_name))
         conn.commit()
-        flash("Your password successfully updated", 'success')
-    #else:
-        #flash("Your token is invalid",'danger')  
-    
-    with conn.cursor() as cursor:
-        cursor.execute("UPDATE court_user SET user_name=%s, user_first=%s, user_last=%s, user_phone=%s,user_question=%s, user_answer=%s, user_address1=%s, user_address2=%s, user_postcode=%s WHERE user_name=%s", (user_name,first_name, last_name, phone_number,question, answer,address1, address2, postcode, user_name))
-        conn.commit()
+        flash('Your profile has been updated', 'success')
 
-    flash('Profile Updated!', 'success')
     return redirect(url_for('profile'))
-
-@app.route('/document/<case_id>/<doc_title>', methods=['GET', 'POST'])
-def document(case_id, doc_title):
-    # ----- Gate Conditions -----
-    user = session.get('user')
-    if user is None:
-        print("Redirecting...")
-        return redirect('/log_in')
-    
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT case_released\n"\
-                        "FROM court_case\n"\
-                        f"WHERE case_number='{case_id}';")
-        released = cursor.fetchone()
-        if released:
-            released = released[0]
-        else:
-            flash('Case does not exists', 'danger')
-            return redirect('/case_list')
-        
-        cursor.execute("SELECT docs_title\n"\
-                        "FROM court_docs\n"\
-                        f"WHERE docs_title='{doc_title}';")
-        validDoc = cursor.fetchone()
-        if not validDoc:
-            flash('Document does not exists', 'danger')
-            return redirect('/case_list')
-
-        cursor.execute("SELECT junction_role\n"\
-                        "FROM junction_case_user\n"\
-                        f"WHERE junction_case={case_id}\n"\
-                        f"AND junction_user='{session.get('user')}';")
-        userRole = cursor.fetchone()
-        if userRole is not None:
-            userRole = userRole[0]
-        else:
-            flash('Case Access Denied', 'danger')
-            return redirect(f'/case_view/{case_id}')
-        
-    conn.commit()
-    return render_template('document.html', title=f'{doc_title}')
 
 
 # ----- Normal Functions ----- (Move to different file eventually)
@@ -632,3 +571,7 @@ def convert_to_alpnum(oldStr):
         if i.isalnum() or i == ' ':
             newStr += i
     return newStr
+
+@app.route('/document')
+def document():
+    return render_template('document.html',title= 'Document')
