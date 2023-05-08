@@ -1,12 +1,14 @@
 {% extends 'layout2.html'%} {%block content%}
 
 <body>
-  <div class="container-md">
-    <h2>Add your text</h2>
-    {{ ckeditor.create(name="editor") }}
-  </div>
-  <div class="mt-5 text-center">
-    <button class="btn btn-primary profile-button" type="submit">Save</button>
-</div>
+  <form method="POST" action="/document/{{ doc[3] }}/{{ doc[0] }}/api/save_text">
+    <div class="container-md">
+      <h2>{{ doc[0] }}</h2>
+      {{ ckeditor.create(value=text) }}
+    </div>
+    <div class="mt-5 text-center">
+      <button class="btn btn-primary profile-button" type="submit">Save</button>
+    </div>
+  </form>
 </body>
 {%endblock content%}

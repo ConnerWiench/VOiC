@@ -34,20 +34,20 @@ ENGINE = InnoDB;
 -- Table `voic_db`.`court_article`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `voic_db`.`court_article` (
-  `case_number` INT NOT NULL AUTO_INCREMENT,
-  `case_article` VARCHAR(45) NOT NULL,
-  `case_chapter` VARCHAR(45) NOT NULL,
-  `case_verdict` VARCHAR(45) NULL,
-  `case_number` INT NOT NULL,
-  PRIMARY KEY (id),
-  INDEX fk_article_case_number_idx (case_number ASC) VISIBLE,
-  CONSTRAINT fk_article_case_number
-  FOREIGN KEY (case_number)
-  REFERENCES voic_db.court_case (case_number)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+-- CREATE TABLE IF NOT EXISTS `voic_db`.`court_article` (
+--   `case_number` INT NOT NULL AUTO_INCREMENT,
+--   `case_article` VARCHAR(45) NOT NULL,
+--   `case_chapter` VARCHAR(45) NOT NULL,
+--   `case_verdict` VARCHAR(45) NULL,
+--   `case_number` INT NOT NULL,
+--   PRIMARY KEY (id),
+--   INDEX fk_article_case_number_idx (case_number ASC) VISIBLE,
+--   CONSTRAINT fk_article_case_number
+--   FOREIGN KEY (case_number)
+--   REFERENCES voic_db.court_case (case_number)
+--   ON DELETE NO ACTION
+--   ON UPDATE NO ACTION)
+-- ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `voic_db`.`court_user`
@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS `voic_db`.`court_user` (
   `user_address2` VARCHAR(90) NULL,
   `user_postcode` VARCHAR(45) NULL,
   `user_token` VARCHAR(45) NOT NULL,
+  `user_state` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_name`),
   UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC) VISIBLE)
 ENGINE = InnoDB;
