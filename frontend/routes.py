@@ -394,7 +394,13 @@ def case_view(case_id):
                         f"WHERE docs_case={case_id};")
         docs = cursor.fetchall()
 
-    return render_template('case_view.html', case=case, people=people, docs=docs, role=userRole, roles=COURT_ROLES)
+    status = False
+    for x in docs:
+        if 'Judge' == x[1]:
+            status = True
+            break
+
+    return render_template('case_view.html', case=case, people=people, docs=docs, role=userRole, roles=COURT_ROLES, status=status)
 
 @app.route('/case_view/<case_id>/remove_user', methods=["POST"])
 def case_view_remove_user(case_id):
@@ -565,8 +571,13 @@ def document(case_id, doc_title):
         except Exception:
             text = ''
 
+        if user == doc[1]:
+            editMode = True
+        else:
+            editMode = False
+
     conn.commit()
-    return render_template('document.html', doc=doc, text=text)
+    return render_template('document.html', doc=doc, text=text, editMode=editMode)
 
 @app.route('/document/<case_id>/<doc_title>/api/save_text', methods=['POST'])
 def doc_api_save(case_id, doc_title):

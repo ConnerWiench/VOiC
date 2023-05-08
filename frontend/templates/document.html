@@ -1,14 +1,23 @@
 {% extends 'layout2.html'%} {%block content%}
 
 <body>
+
   <form method="POST" action="/document/{{ doc[3] }}/{{ doc[0] }}/api/save_text">
+    {% if editMode %}
     <div class="container-md">
       <h2>{{ doc[0] }}</h2>
       {{ ckeditor.create(value=text) }}
     </div>
     <div class="mt-5 text-center">
       <button class="btn btn-primary profile-button" type="submit">Save</button>
+      <a class="btn btn-danger" href="/case_view/{{ doc[3] }}">Discard</a>
     </div>
+    {% else %}
+    <div class="container-md">
+      <h2>{{ doc[0] }} : Read Only</h2><br>
+      {{ text|safe }}
+    </div>
+    {% endif %}
   </form>
 </body>
 {%endblock content%}
