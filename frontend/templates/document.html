@@ -14,10 +14,11 @@
     </div>
     {% else %}
     <div class="container-md">
-      <h2>{{ doc[0] }} : Read Only</h2><br>
+      <h2>{{ doc[0] }}</h2><br>
       {{ text|safe }}
     </div>
     {% endif %}
   </form>
 </body>
 {%endblock content%}
+{% include 'flash_footer.html' %}

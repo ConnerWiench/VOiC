@@ -526,7 +526,6 @@ def case_view_add_doc(case_id):
     conn.commit()
     return redirect(f'/document/{case_id}/{title}')
 
-
 @app.route('/document/<case_id>/<doc_title>', methods=['GET', 'POST'])
 def document(case_id, doc_title):
     # ----- Gate Conditions -----
@@ -546,7 +545,7 @@ def document(case_id, doc_title):
             flash('Case does not exists', 'danger')
             return redirect('/case_list')
 
-        cursor.execute("SELECT docs_title, docs_author, docs_path, docs_case\n"\
+        cursor.execute("SELECT docs_title, docs_author, docs_path, docs_case, docs_type\n"\
                         "FROM court_docs\n"\
                         f"WHERE docs_title='{doc_title}';")
         doc = cursor.fetchone()
@@ -564,6 +563,20 @@ def document(case_id, doc_title):
         else:
             flash('Case Access Denied', 'danger')
             return redirect(f'/case_view/{case_id}')
+        
+        # Document Role Protections
+        docRole = doc[4]
+        if not released:
+            if userRole != 'Judge' and docRole == 'Judge':
+                flash('Document Access Denied', 'danger')
+                return redirect(f'/case_view/{case_id}')
+            if userRole == 'Lawyer' and docRole != 'Lawyer':
+                flash('Document Access Denied', 'danger')
+                return redirect(f'/case_view/{case_id}')
+            if userRole == 'Other':
+                flash('Document Access Denied', 'danger')
+                return redirect(f'/case_view/{case_id}')
+
 
         try:
             with open(doc[2], 'r') as f:
