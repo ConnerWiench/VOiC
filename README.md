@@ -32,11 +32,13 @@ You will also want a similar command to install pip3. This will allow you to ins
 Now you will need to clone the git repository to your local machine.  If you don't have git, you will need to install that package.
 
 >  $ sudo apt install git
+
 >  $ git clone https://github.com/ConnerWiench/VOiC.git
 
 We will now use move into the cloned repository and use the 'requirements.txt' file to download all required python libraries to install VOiC.
 
 >  $ cd VOiC
+
 >  $ pip3 install -r requirements.txt
 
 Once all the libraries finish installing, you will need to create a database and user that has access to the database.  Start by installing the MySQL client. Version 8.0 is suggested.
@@ -50,6 +52,7 @@ We will need to first log in to the mysql client using the root user.  From here
 You can use the following two commands in the mysql terminal to create the database and user.  Replace the \<password\> field with your desired password.
 
 >  mysql> CREATE DATABASE voic_db;
+
 >  mysql> CREATE USER 'voic'@'localhost' IDENTIFIED
 >         WITH authentication_plugin BY '\<password\>';
 
@@ -68,14 +71,19 @@ With the information used to create the database user, we will now create the .e
 >  SECRET_KEY=\<session key (can be anything)\>
 
 >  MAIL_USERNAME=\<email@domain.com\>
+
 >  MAIL_PASSWORD=\<email password\>
 
 >  DB_HOST=localhost
+
 >  DB_USER=voic
+
 >  DB_PASSWORD=\<user password\>
+
 >  DB_NAME=voic_db
 
 >  RECAPTCHA_PUBLIC_KEY=\<public key\>
+
 >  RECAPTCHA_PRIVATE_KEY=\<private key\>
 
 Updated the information to what you set it as in the earlier steps.  You should only need to change the user, and the password.
