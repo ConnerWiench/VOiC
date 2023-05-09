@@ -146,6 +146,7 @@
               <td>{% if doc[2] %}Approved{% else %}Pending{% endif %}</td>
             </tr>
             {% endfor %}
+            {% if role  %}
             <tr class="card-footer">
               <form method="POST" action="/case_view/{{ case[0] }}/create_doc">
                 <td class="form-group">
@@ -158,6 +159,7 @@
                 </td>
               </form>
             </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>

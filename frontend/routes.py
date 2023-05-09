@@ -560,13 +560,11 @@ def document(case_id, doc_title):
         userRole = cursor.fetchone()
         if userRole is not None:
             userRole = userRole[0]
-        else:
-            flash('Case Access Denied', 'danger')
-            return redirect(f'/case_view/{case_id}')
         
         # Document Role Protections
         docRole = doc[4]
         if not released:
+            print("Case Status: " + released)
             if userRole != 'Judge' and docRole == 'Judge':
                 flash('Document Access Denied', 'danger')
                 return redirect(f'/case_view/{case_id}')
@@ -576,7 +574,6 @@ def document(case_id, doc_title):
             if userRole == 'Other':
                 flash('Document Access Denied', 'danger')
                 return redirect(f'/case_view/{case_id}')
-
 
         try:
             with open(doc[2], 'r') as f:
