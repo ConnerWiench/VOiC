@@ -21,7 +21,8 @@
     -pip install -r requirements.txt
 
 
-**In Depth Installation Steps:**
+
+## In Depth Installation Steps:
 
 VOiC requires many setup steps to properly function.  Developers should be capable of using a bash terminal as it is required for many installation steps.  A Unix-based operating system, preferably a Debian Linux distribution, is the suggested method, but Windows Subsystem Linux (WSL) is also acceptable to.  Now you will want to install python3 by open up a bash terminal, using the following command to install the python3 package.
 
