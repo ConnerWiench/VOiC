@@ -564,7 +564,6 @@ def document(case_id, doc_title):
         # Document Role Protections
         docRole = doc[4]
         if not released:
-            print("Case Status: " + released)
             if userRole != 'Judge' and docRole == 'Judge':
                 flash('Document Access Denied', 'danger')
                 return redirect(f'/case_view/{case_id}')
